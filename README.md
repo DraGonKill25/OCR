@@ -23,7 +23,7 @@
 
 
 #POUR FIXER UN POINT DANS VOS COMMITS POUR SAVOIR QUELLE COMMIT RECUPERER SI CA PLANTE :
-``git stash`` : vos pouver ainsi creer une etiquette et la verifier avec "-s" et "-v"
+``git stash`` : vos pouver ainsi creer une etiquette et la verifier avec "`-s`" et "`-v`"
 
 
 #POUR SUPPRIMER DES COMMITS FAIS PAR DES CAMARADES PAS TRES GENTIL QUI POLLUE LE REPO
