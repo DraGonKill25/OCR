@@ -1,5 +1,13 @@
 # OCR
 
+#AJOUTER SON TRAVAIL SUR LE REPO
+``git add {nom du/des fichier(s)/dossier(s)}`` : permet de selectionner les fichiers que l'ont veux push
+
+``git commit -m "{un message precis du pk du commit}"``
+
+``git push`` : ajouter tous les elements du commit sur le repo en ligne
+
+
 #POUR CREER ET MERGE LES BRANCHS
 
 ``git branch ``: creer une nouvelle branche
