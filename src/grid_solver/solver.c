@@ -2,6 +2,14 @@
 //however the main will be in an other file
 //i will add a Makefile especially for this part later
 //for just try to make all the function work correctly
+#include <stdio.h>
+#include <stdlib.h>
+
+
+
+
+
+
 
 //-------------------------------------------
 //           solver relative tool
@@ -40,6 +48,8 @@ int Grid_Check(int grid[][9], int row, int col, int num){
     }
     return 1;
 }
+
+
 
 int Solve_Sudoku(int grid[][9], int row, int col){
 
@@ -83,9 +93,12 @@ int Solve_Sudoku(int grid[][9], int row, int col){
         return 1;
 }
 
-void read_file(char *name, int grid[9][9]){
 
-    FILE *file = fopen(name, "r");
+
+void read_file(char *file_name, int grid[9][9]){
+
+    FILE *file = NULL;
+    file = fopen(file_name, "r");
     int c, i = 0, j = 0;
 
     while ((c = fgetc(file)) != EOF){
@@ -125,22 +138,22 @@ size_t my_str_len(char str[]){
     return len;
 }
 
-void write_file(char *name, int grid[9][9]){
+void write_file(char *file_name, int grid[9][9]){
 //create le the file name in a good format
 
-    char result_name[my_str_len(name) + 7 + 1];
+    char result_name[my_str_len(file_name) + 7 + 1];
 
-    for (size_t i = 0; i < my_str_len(name); i++)
-        result_name[i] = name[i];
+    for (size_t i = 0; i < my_str_len(file_name); i++)
+        result_name[i] = file_name[i];
 
 
     char extension[] = ".result";
 
     for (size_t i = 0; i < my_str_len(extension); i++)
-        result_name[my_str_len(name) + i] = extension[i];
+        result_name[my_str_len(file_name) + i] = extension[i];
 
 
-    result_name[my_str_len(name) + 7] = '\0'; //last caractere 0: end of the string
+    result_name[my_str_len(file_name) + 7] = '\0'; //last caractere 0: end of the string
 
 
 //end of the writing file name
