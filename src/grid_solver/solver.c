@@ -1,231 +1,205 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
+//all the function in this file are going to be used for solve the sudoku
+//however the main will be in an other file
+//i will add a Makefile especially for this part later
+//for just try to make all the function work correctly
+
+//-------------------------------------------
+//           solver relative tool
+//------------------------------------------
+//Main function
+int Solve_Sudoku(int grid[][9], int row, int col);
+
+//check if the given grill have the right parameter and fit with the rules of
+//a sudoku
+int Grid_Check(int grid[][9],int row, int col, int num);
 
 
-void Interchange_Row(int n1,int n2);
-void Interchange_Column(int n1,int n2);
-void Interchange_GroupRows(int n1,int n2);
-void Interchange_GroupColumns(int n1,int n2);
-void Clear_Cell(int lvl);
-void push(int a, int b, int c);
-struct Stack *pop();
-void solver(int arr[9][9]);
-int Is_It_Safe(int arr[9][9],int row, int col, int n);
-void display(int arr[9][9]);
-void copy_arr();
-int arr[9][9];
-int arr1[9][9];
-int c=0;
+
+//-----------------------------------------
+//              file management tool
+//-----------------------------------------
+
+
+
+
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+
+
+int Grid_Check(int grid[][9], int row, int col, int num){
+
+    int rowStart = (row/3) * 3;
+    int colStart = (col/3) * 3;
+    int i;
+
+    for(i=0; i<9; ++i){
+
+        if (grid[row][i] == num) return 0;
+        if (grid[i][col] == num) return 0;
+        if (grid[rowStart + (i%3)][colStart + (i/3)] == num) return 0;
+    }
+    return 1;
+}
+
+int Solve_Sudoku(int grid[][9], int row, int col){
+
+    if(row<9 && col<9){
+
+        if(grid[row][col]){
+
+            if((col+1)<9) return Solve_Sudoku(grid, row, col+1);
+            else if((row+1)<9) return Solve_Sudoku(grid, row+1, 0);
+            else return 1;
+        }
+        else{
+
+            for(int i=1; i<10; i++){
+
+                if(Grid_Check(grid, row, col, i)){
+
+                    grid[row][col] = i;
+                    if((col+1)<9){
+
+                        if(Solve_Sudoku(grid, row, col +1))
+                            return 1;
+                        else grid[row][col] = 0;
+                    }
+
+                    else if((row+1)<9){
+
+                        if(Solve_Sudoku(grid, row+1, 0))
+                            return 1;
+                        else grid[row][col] = 0;
+                    }
+
+                    else
+                        return 1;
+                }
+            }
+        }
+        return 0;
+    }
+    else
+        return 1;
+}
+
+void read_file(char *name, int grid[9][9]){
+
+    FILE *file = fopen(name, "r");
+    int c, i = 0, j = 0;
+
+    while ((c = fgetc(file)) != EOF){
+
+        if (c == ' ' || c == '\n' || c == '\r' || c == '\0' || c == '\f')
+            continue;
+
+        if (c == '.'){
+
+            grid[i][j] = 0;
+            j += 1;
+        }
+
+        else{
+
+            grid[i][j] = (int) c - 48;
+            j += 1;
+        }
+
+        if (j == 9){
+
+            i += 1;
+            j = 0;
+        }
+    }
+
+    fclose(file);
+
+}
+
+size_t my_str_len(char str[]){
+
+    size_t len = 0;
+    while (str[len] != '\0')
+        len += 1;
+
+    return len;
+}
+
+void write_file(char *name, int grid[9][9]){
+//create le the file name in a good format
+
+    char result_name[my_str_len(name) + 7 + 1];
+
+    for (size_t i = 0; i < my_str_len(name); i++)
+        result_name[i] = name[i];
+
+
+    char extension[] = ".result";
+
+    for (size_t i = 0; i < my_str_len(extension); i++)
+        result_name[my_str_len(name) + i] = extension[i];
+
+
+    result_name[my_str_len(name) + 7] = '\0'; //last caractere 0: end of the string
+
+
+//end of the writing file name
+
+
+    FILE *file;
+    file = fopen(result_name, "w");
+
+
+    for (size_t i = 0; i < 9; i++){
+
+        for (size_t j = 0; j < 9; j++){
+
+            fputc(48 + grid[i][j], file);
+
+            if ((j + 1) % 3 == 0 && (j != 8))
+                fputc(32,file);
+
+        }
+
+        if ((i + 1) % 3 == 0)
+            fputc(10, file);
+
+        fputc(10, file);
+    }
+
+    fclose(file);
+}
+
+
+
 int main()
 {
-    int ext=0;
-    int i,j,a,b,level;
-    
-    return 0;
-}
+    int i, j;
+    int grid [9][9]= {{0, 2, 0, 0, 0, 0, 6, 0, 9},
+                      {8, 5, 7, 0, 6, 4, 2, 0, 0},
+                      {0, 9, 0, 0, 0, 1, 0, 0, 0},
+                      {0, 1, 0, 6, 5, 0, 3, 0, 0},
+                      {0, 0, 8, 1, 0, 3, 5, 0, 0},
+                      {0, 0, 3, 0, 2, 9, 0, 8, 0},
+                      {0, 0, 0, 4, 0, 0, 0, 6, 0},
+                      {0, 0, 2, 8, 7, 0, 1, 3, 5},
+                      {1, 0, 6, 0, 0, 0, 0, 2, 0}
+                    };
 
-    //Eliminate the cells
-    void Clear_Cell(int lvl)
-    {
-        int x,y;
-    while(lvl>0)
-    {
-        int cell_number = rand() % 82;
-        int i = cell_number / 9;
-        int j = cell_number % 9;
+    if(Solve_Sudoku(grid, 0, 0)){
 
-        if(j!=0)
-            j = j-1;
+        printf("\n+-----+-----+-----+\n");
 
-        if(arr[i][j]!=0)
-        {
-                arr[i][j]=0;
-                lvl--;
+        for(i=1; i<10; ++i){
+
+            for(j=1; j<10; ++j) printf("|%d", grid[i-1][j-1]);
+            printf("|\n");
+
+            if (i%3 == 0) printf("+-----+-----+-----+\n");
         }
     }
-    }
-
-
-    //SOLVER
-int num=1;
-//CREATING THE STACK
-struct Stack
-{
-    int row;
-    int column;
-    int number;
-    struct Stack *prev;
-    struct Stack *next;
-};
-
-//TO PUSH INTO THE STACK
-struct Stack *top=NULL;
-void push(int a, int b, int c)
-{
-    struct Stack temp *= (struct Stack *)malloc(sizeof(struct Stack));
-    temp->next = NULL;
-    temp->prev = top;
-    top = temp;
-    temp->row = a;
-    temp->column = b;
-    temp->number = c;
-}
-
-//TO POP FROM STACK
-struct Stack *pop()
-{
-    if(top==NULL)
-        return NULL;
     else
-        {
-            struct Stack *temp = top;
-            top = top->prev;
-            return temp;
-        }
-}
+        printf("\n\nNO SOLUTION\n\n");
 
-//FUNCTION TO SOLVE THE SUDOKU USING STACK WHICH IS IMPLIMENTED BY DOUBLY LINKED LIST
-void solver(int arr[9][9])
-{
-    int i,j,q,var;
-    do
-    {
-        q=0;
-        var=0;
-    for(i=0;i<9;i++)
-    {
-        for(j=0;j<9;j++)
-        {
-            if(arr[i][j]==0)
-            {
-                q=202;
-                int k;
-                for(k=num;k<=9;k++)
-                {
-                   // printf("%d",k);
-                    if(Is_It_Safe(arr, i, j, k)==1)
-                    {
-                        q=10;
-                        arr[i][j]=k;
-                        push(i,j,k);
-                        num=1;
-                        break;
-                    }
-                }
-               // printf("\n");
-                if(q!=10)
-                {
-                    struct Stack *tem = pop();
-                    if(tem==NULL){
-                        c=100;
-                        printf("no");
-                    }
-                    else
-                    {
-                        arr[tem->row][tem->column] = 0;
-                        num = tem->number + 1;
-                    }
-                    var=1;break;
-                }
-            }
-            if(i==8 && j==8 && q==0){
-                c=200;
-            }
-        }
-        if(var==1){
-            break;}
-    }
-    }while(c==0);
-}
-
-//TO CHECK IF IT IS FINE TO PUT THE NUMBER IN A PARTICULAR PLACE
-int Is_It_Safe(int arr[9][9],int row, int col, int n)
-{
-    int i,j;
-    //TO CHECK IN THE ROW
-    for (i = 0; i < 9; i++)
-    {
-        if (arr[row][i] == n)
-        {
-            //printf("row");
-            return 0;
-        }
-    }
-
-    //TO CHECK IN THE COLUMN
-    for (i = 0; i < 9; i++)
-    {
-        if (arr[i][col] == n)
-        {
-           // printf("col");
-            return 0;
-        }
-    }
-
-    //TO CHECK IN SQUARE
-    int p = row - row % 3;
-    int q = col - col % 3;
-  //  printf("|%d %d|",row,col);
-    for (i = p; i < p + 3; i++)
-    {
-        for (j = q; j < q + 3; j++)
-        {
-            if (arr[i][j] == n)
-            {
-               // printf("%d %d box", i,j);
-                return 0;
-            }
-        }
-    }
-
-    return 1;
-}
-
-//DISPLAY THE SUDOKU
-void display(int arr[9][9])
-{
-    int i,j;
-    for(i=0;i<9;i++)
-    {
-        printf("-------------------------------------\n");
-        for(j=0;j<9;j++)
-        {
-            if(j==8)
-                printf("| %d |",arr[i][j]);
-            else
-                printf("| %d ",arr[i][j]);
-        }
-        printf("\n");
-        if(i==8)
-            printf("---------------------------------------\n\n");
-    }
-}
-
-//COPY SUDOKU FROM ARR TO ARR1
-void copy_arr()
-{
-    int i,j;
-    for(i=0;i<9;i++)
-    {
-        for(j=0;j<9;j++)
-        {
-            arr1[i][j]=arr[i][j];
-        }
-    }
-}
-
-//CHECK WHETER THE ANSWE ENTERED BY THE USER IS CORRECT OR NOT
-int check()
-{
-    int i,j;
-    for(i=0;i<9;i++)
-    {
-        for(j=0;j<9;j++)
-        {
-            if(arr1[i][j]!=arr[i][j])
-                return 0;
-        }
-    }
-    return 1;
+    return 0;
 }
