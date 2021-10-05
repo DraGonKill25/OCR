@@ -26,8 +26,8 @@ int Grid_Check(int grid[][9],int row, int col, int num);
 //              file management tool
 //-----------------------------------------
 
-void read_file(char *file_name);
-void change_dot(char *file_name, int grid[9][9]);
+
+//void change_dot(char *file_name, int grid[9][9]);
 size_t my_str_len(char str[]);
 void write_file(char *file_name, int grid[9][9]);
 
@@ -93,34 +93,12 @@ int Solve_Sudoku(int grid[][9], int row, int col){
 }
 
 
-void read_file(char *file_name){
-    int i,j;
-    int ax[9][9];
-    FILE fichier;
-
-    // Ouverture d'un fichier et détermination de sa taille
-    fichier =fopen(str(*file_name),"r");
-    if (fichier!=NULL)
-    {
-        i = 0,
-
-        while (fscanf(fichier,"%d %d %d\n",&ax[i][0], &ax[i][1], &ax[i][2]) == 3)
-                i++;
-
-        fclose(fichier);
-
-        for(j = 0; j < i; j++)
-            printf("%d %d %d\n",ax[j][0], ax[j][1], ax[j][2]);
-    }
-}
-
-
-
-void change_dot(char *file_name, int grid[9][9]){
+int change_dot(char *file_name/*, int grid[9][9]*/){
 
     FILE *file = NULL;
     file = fopen(file_name, "r");
     int c, i = 0, j = 0;
+    int grid[9][9];
 
     while ((c = fgetc(file)) != EOF){
 
@@ -144,7 +122,7 @@ void change_dot(char *file_name, int grid[9][9]){
     }
 
     fclose(file);
-
+    return grid[i][j];
 }
 
 size_t my_str_len(char str[]){
@@ -216,7 +194,7 @@ int main(int argc,  char *argv[]){
     if(test==0)
         errx(1,"The parameter is not valid");
 
-    read_file(str(argv[1]));
+
 
     /*int i, j;
     int grid [9][9]= {{0, 2, 0, 0, 0, 0, 6, 0, 9},
