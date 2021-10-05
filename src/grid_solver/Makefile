@@ -1,9 +1,19 @@
 CC=gcc
+CPPFLAGS= -MMD -D_XOPEN_SOURCE
 CFLAGS=-Wall -Werror -Wextra -std=c99 -O1
 LDFLAGS=
 LDLIBS=
 EXEC=
 
-all=main
+SRC= solver.c
+OBJ= ${SRC:.c=.o}
+DEP= ${SRC:.c=.d}
 
+all: solver
 
+-include ${DEP}
+
+solver: ${OBJ}
+
+clean:
+	rm -f ${OBJ} ${DEP} solver
