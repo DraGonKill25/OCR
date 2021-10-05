@@ -1,20 +1,19 @@
-//all the function in this file are going to be used for solve the sudoku
-//however the main will be in an other file
-//i will add a Makefile especially for this part later
-//for just try to make all the function work correctly
 #include <stdio.h>
 #include <stdlib.h>
+#include <err.h>
 
 
 
 
-
-
+//all the function in this file are going to be use for solve the sudoku
+//however the main will be in an other file name main.c
+//i will add a Makefile excpecialy for this part later
+//for just try to make all the function work corretly
 
 //-------------------------------------------
 //           solver relative tool
 //------------------------------------------
-//Main function
+//Function that solve the sudoku
 int Solve_Sudoku(int grid[][9], int row, int col);
 
 //check if the given grill have the right parameter and fit with the rules of
@@ -27,8 +26,10 @@ int Grid_Check(int grid[][9],int row, int col, int num);
 //              file management tool
 //-----------------------------------------
 
-
-
+void read_file(char *file_name);
+void change_dot(char *file_name, int grid[9][9]);
+size_t my_str_len(char str[]);
+void write_file(char *file_name, int grid[9][9]);
 
 //------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -48,8 +49,6 @@ int Grid_Check(int grid[][9], int row, int col, int num){
     }
     return 1;
 }
-
-
 
 int Solve_Sudoku(int grid[][9], int row, int col){
 
@@ -94,8 +93,30 @@ int Solve_Sudoku(int grid[][9], int row, int col){
 }
 
 
+void read_file(char *file_name){
+    int i,j;
+    int ax[9][9];
+    FILE fichier;
 
-void read_file(char *file_name, int grid[9][9]){
+    // Ouverture d'un fichier et détermination de sa taille
+    fichier =fopen(str(*file_name),"r");
+    if (fichier!=NULL)
+    {
+        i = 0,
+
+        while (fscanf(fichier,"%d %d %d\n",&ax[i][0], &ax[i][1], &ax[i][2]) == 3)
+                i++;
+
+        fclose(fichier);
+
+        for(j = 0; j < i; j++)
+            printf("%d %d %d\n",ax[j][0], ax[j][1], ax[j][2]);
+    }
+}
+
+
+
+void change_dot(char *file_name, int grid[9][9]){
 
     FILE *file = NULL;
     file = fopen(file_name, "r");
@@ -107,19 +128,16 @@ void read_file(char *file_name, int grid[9][9]){
             continue;
 
         if (c == '.'){
-
             grid[i][j] = 0;
             j += 1;
         }
 
         else{
-
             grid[i][j] = (int) c - 48;
             j += 1;
         }
 
         if (j == 9){
-
             i += 1;
             j = 0;
         }
@@ -185,9 +203,22 @@ void write_file(char *file_name, int grid[9][9]){
 
 
 
-int main()
-{
-    int i, j;
+int main(int argc,  char *argv[]){
+
+    if(strtoul(argv[1],NULL,10)==0)
+        errx(1,"Error");
+
+    if (argc!=2)
+        errx(1,"The number of arguments is not valid");
+
+    unsigned long test = strtoul(argv[1],NULL,10);
+
+    if(test==0)
+        errx(1,"The parameter is not valid");
+
+    read_file(str(argv[1]));
+
+    /*int i, j;
     int grid [9][9]= {{0, 2, 0, 0, 0, 0, 6, 0, 9},
                       {8, 5, 7, 0, 6, 4, 2, 0, 0},
                       {0, 9, 0, 0, 0, 1, 0, 0, 0},
@@ -212,7 +243,7 @@ int main()
         }
     }
     else
-        printf("\n\nNO SOLUTION\n\n");
+        printf("\n\nNO SOLUTION\n\n");*/
 
     return 0;
 }
