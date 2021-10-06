@@ -1,19 +1,22 @@
 CC=gcc
-CPPFLAGS= -MMD -D_XOPEN_SOURCE
-CFLAGS=-D_REENTRANT -I/usr/include/SDL2
+CPPFLAGS=
+CFLAGS=-Wall -Wextra -Werror -std=c99
 LDFLAGS=
 LDLIBS=-lSDL2_image -lSDL2
-EXEC=
+EXEC=imagetreatment
 
 SRC= image_treatment.c
 OBJ= ${SRC:.c=.o}
-DEP= ${SRC:.c=.d}
 
-all: imagetreatment
+all: ${EXEC}
 
--include ${DEP}
 
-imagetreatment: ${OBJ}
+
+${EXEC}: ${OBJ}
+
+	${CC} ${LDLIBS} ${LDFLAGS} -o $@ $^ 
+
+
 
 clean:
-	rm -f ${OBJ} ${DEP} imagetreatment
+	rm -f ${OBJ} ${EXEC}
