@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
+
 //softmax function
 
 static void softmax(double *input, int input_len)
@@ -31,217 +32,90 @@ static void softmax(double *input, int input_len)
 	}
 }
 
-//define neuron
-
-typedef struct neuron_t
-{
-	float activ;
-	float *out_weights;
-	float bias;
-	float z;
-
-	float dactv;
-	float *dw;
-	float dbias;
-	float dz;
-
-} neuron;
-
-typedef struct layer_t
-{
-	int num_neu;
-	struct neuron_t *neu;
-} layer;
-
-// architecture
-
-int create_architecture()
-{
-	lay = (layer*) malloc(num_layers * sizeof(layer));
-
-	for (int i = 0, i < num_layers; i++)
-	{
-		lay[i] = create_layer(num_neurons[i]);
-		lay[i].num_neu = num_neurons[i];
-
-		for (int j = 0; j < num_neurons[i]; j++)
-		{
-			if (i < (num_layers - 1))
-			{
-				lay[i].neu[j] = create_neuron(num_neurons[i+1]);
-			}
-		}
-	}
-	//initialize weight
-	
-	if (initialize_weights() != SCCESS_INIT_WEIGHTS)
-	{
-		return ERR_CREATE_ARCHITECTURE;
-	}
-
-	return SUCCESS_CREATE_ARCHITECTURE;
-}
-
-//training examples
-
-void get_inputs()
-{
-	for (int i = 0; i < num_training_ex; i++)
-	{
-		printf("Enter the Inputs for training example[%d]:\n",i);
-		for(int j = 0; j<num_neurons[0]; j++)
-		{
-			scanf("%f",input[i][j]);
-		}
-	}
-	printf("\n"):
-}
-
-void get_desired_outputs()
-{
-	for (int i = 0; i < num_training_ex; i++)
-	{
-		for (int j = 0; j < num_neurons[num_layers-1]; j++)
-		{
-			printf("Enter the Desired Outputs (Labels) for training example[%d]...\n",i);
-            		scanf("%f",&desired_outputs[i][j]);
-            		printf("\n");
-		}
-	}
-}
-
-void forward_prop(void)
-{
-
-    for(int i=1;i<num_layers;i++)
-    {   
-        for(int j=0;j<num_neurons[i];j++)
-        {
-            lay[i].neu[j].z = lay[i].neu[j].bias;
-
-            for(int k=0;k<num_neurons[i-1];k++)
-            {
-                lay[i].neu[j].z  = lay[i].neu[j].z + ((lay[i-1].neu[k].out_weights[j])* (lay[i-1].neu[k].actv));
-            }
-
-            // Relu Activation Function for Hidden Layers
-            if(i < num_layers-1)
-            {
-                if((lay[i].neu[j].z) < 0)
-                {
-                    lay[i].neu[j].actv = 0;
-                }
-
-                else
-                {
-                    lay[i].neu[j].actv = lay[i].neu[j].z;
-                }
-            }
-            
-            // Sigmoid Activation function for Output Layer
-            else
-            {
-                lay[i].neu[j].actv = 1/(1+exp(-lay[i].neu[j].z));
-                printf("OUTPUT: %d\n", (int)round(lay[i].neu[j].actv));
-                printf("\n");
-            }
-        }
-    }
-}
 
 //Initialize 
 
+//Out => Softmax Function
+
+//Number of inputs
+int numInput = 2;
+
+//Number of hidden layers
+int numHidden = 1;
 
 
-double Input[NumInput+1];
-double SumH[NumHidden+1];
-double Hidden[NumHidden+1];
-double WeightIH[NumInput+1][NumHidden+1]
+
+double input[numInput+1];
+double sumH[numHidden+1];
+double hidden[numHidden+1];
+double weightIH[numInput+1][numHidden+1];
+double output[numO+1];
+double sumO[numO];
 
 
-SumH = Weight[0];
-for (int i = 1; i<= NumInput; i++)
+
+//xor learn and training
+
+
+for (int epoch = 1; epoch < 5000; epoch++)
 {
-	SumH += Input[i]*Weight[i];
-}
-Hidden = ;//SoftMax activation function
+	float Error = 0.0;
 
-
-
-
-
-for (int j = 1; j <= NumHidden; j++)
-{
-	for (int i = 0; i <= NumInput; i++)
+	for (p = 1; p <= numPattern; p++)
 	{
-		DeltaWeightIH[i][j] = 0.0;
-		WeightIH[i][j] = 2.0 * (rando() - 0.5
-	}
-}
 
-Error = 0.0;
-
-for (int p = 1; p <= NumPattern; p++)
-{
-	for (int j = 1; j <= NumHidden; j++)
+		for(int j = 1; j <= numHidden; j++)
 		{
-			SumH[p][j] = WeightIH[0][j];
-			for (int i = 1; i ,= NumInput; i++)
+			
+			sumH[p][j] = weightIH[0][j];
+
+			for(int i = 1; i <= numInput; i++)
 			{
-				SumH[p][j] += Input[p][j] * WeightIH[i][i];
+				sumH[p][j] += input[p][i] * weightIH[i][j];
 			}
-			Hidden[p][j] += ;	//softmax function
+			hidden[p][j] = 1.0/(1.0 + exp(-sumH[p][j]));
 		}
-	for( int k = 1 ; k <= NumOutput ; k++ )
-	{
-		SumO[p][k] = WeightHO[0][k] ;
-    	for( int j = 1 ; j <= NumHidden ; j++ ) 
-	{
-		SumO[p][k] += Hidden[p][j] * WeightHO[j][k];
+
+		for(int k = 1; k <= numOutput; k++)
+		{
+			sumO[p][k] = weightHO[0][k];
+			for(int j = 1; j <= numHidden; j++)
+			{
+				sumO[p][k] += hidden[p][j] * weightHO[j][k];
+			}
+			output[p][k] = 1.0/(1.0 + exp(-sumO[p][k]));
+			Error += 0.5 * (target[p][k] - output[p][k]) * (target[p][k] - output[p][k]);
+			DeltaO[k] = (target[p][k] - output[p][k]) * ouput[p][k] * (1.0 - output[p][k]);
+		}
+
+		for(int j = 1; j <= numHidden; j++)
+		{
+			sumDOW[j] = 0.0;
+			for(int k = 1; k <= numOuput; k++)
+			{
+				sumDOW[j] += weightHO[j][k] * DeltaO[k];
+			}
+			deltaH[j] = sumDOW[j] * hidden[p][j] * (1.0 - hidden[p][j]);
+			weightIH[0][j] += deltaWeightIH[0][j];
+			
+			for(int i = 1; i <= numInput; i++)
+			{
+				deltaWeightIH[i][j] = eta * deltaH[j] + alpha * deltaWeightIH[0][j];
+				weightIH[i][j] += deltaWeightIH[i][j];
+			}
+		}
+		for (int k = 1; k <= numOuput; k++)
+		{
+			deltaWeightHO[0][k] = eta * deltaO[k] + alpha * deltaweightHO[0][k];
+			wightHO[0][k] += deltaweightHO[0][k];
+
+			for(int j = 1; j <= numHidden; j++)
+			{
+				deltaWeightHO[j][k] = eta * hidden[p][j] * deltaO[k] + alpha * deltaWeightHO[j][k];
+				wightHO[j][k] += deltaWeight[j][k];
+			}
+		}
+
 	}
-
-	Output[p][k] = ;//softmax
-	Error += 0.5 * (Target[p][k] - Output[p][k]) * (Target[p][k] - Output[p][k]) ;
-	DeltaO[k] = (Target[p][k] - Output[p][k]) * Output[p][k] * (1.0 - Output[p][k]);
-	}
-    	for( int j = 1 ; j <= NumHidden ; j++ )
-	{		/* 'back-propagate' errors to hidden layer */
-        	SumDOW[j] = 0.0 ;
-        	for(int k = 1 ; k <= NumOutput ; k++ )
-		{
-            		SumDOW[j] += WeightHO[j][k] * DeltaO[k] ;
-        	}
-        	DeltaH[j] = SumDOW[j] * Hidden[p][j] * (1.0 - Hidden[p][j]) ;
-    	}
-    	for( int j = 1 ; j <= NumHidden ; j++ )
-	{         /* update weights WeightIH */
-        	DeltaWeightIH[0][j] = eta * DeltaH[j] + alpha * DeltaWeightIH[0][j] ;
-        	WeightIH[0][j] += DeltaWeightIH[0][j] ;
-        	for(int i = 1 ; i <= NumInput ; i++ )
-		{
-            		DeltaWeightIH[i][j] = eta * Input[p][i] * DeltaH[j] + alpha * DeltaWeightIH[i][j];
-            		WeightIH[i][j] += DeltaWeightIH[i][j] ;
-        	}
-    	}
-    	for( int k = 1 ; k <= NumOutput ; k ++ )
-	{         /* update weights WeightHO */
-        	DeltaWeightHO[0][k] = eta * DeltaO[k] + alpha * DeltaWeightHO[0][k] ;
-        	WeightHO[0][k] += DeltaWeightHO[0][k] ;
-        	for( int j = 1 ; j <= NumHidden ; j++ )
-		{
-            		DeltaWeightHO[j][k] = eta * Hidden[p][j] * DeltaO[k] + alpha * DeltaWeightHO[j][k] ;
-            		WeightHO[j][k] += DeltaWeightHO[j][k] ;
-        	}
-    	}
+	if(Error < 0.10) break; //when the error is minimum, the xor learnt
 }
-
-//training process
-
-for (epoch = 1; epoch <= 15000; j++)
-{
-	if (Error < 0.010) break;
-}
-
-
-
-
