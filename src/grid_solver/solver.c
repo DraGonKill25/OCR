@@ -14,11 +14,11 @@
 //           solver relative tool
 //------------------------------------------
 //Function that solve the sudoku
-int Solve_Sudoku(int grid[][9], int row, int col);
+int Solve_Sudoku(int grid[9][9], int row, int col);
 
 //check if the given grill have the right parameter and fit with the rules of
 //a sudoku
-int Grid_Check(int grid[][9],int row, int col, int num);
+int Grid_Check(int grid[9][9],int row, int col, int num);
 
 
 
@@ -35,7 +35,7 @@ void write_file(char *file_name, int grid[9][9]);
 //------------------------------------------------------------------
 
 
-int Grid_Check(int grid[][9], int row, int col, int num){
+int Grid_Check(int grid[9][9], int row, int col, int num){
 
     int rowStart = (row/3) * 3;
     int colStart = (col/3) * 3;
@@ -50,7 +50,7 @@ int Grid_Check(int grid[][9], int row, int col, int num){
     return 1;
 }
 
-int Solve_Sudoku(int grid[][9], int row, int col){
+int Solve_Sudoku(int grid[9][9], int row, int col){
 
     if(row<9 && col<9){
 
@@ -93,36 +93,12 @@ int Solve_Sudoku(int grid[][9], int row, int col){
 }
 
 
-int change_dot(char *file_name/*, int grid[9][9]*/){
+int change_dot(char toto){
 
-    FILE *file = NULL;
-    file = fopen(file_name, "r");
-    int c, i = 0, j = 0;
-    int grid[9][9];
-
-    while ((c = fgetc(file)) != EOF){
-
-        if (c == ' ' || c == '\n' || c == '\r' || c == '\0' || c == '\f')
-            continue;
-
-        if (c == '.'){
-            grid[i][j] = 0;
-            j += 1;
-        }
-
-        else{
-            grid[i][j] = (int) c - 48;
-            j += 1;
-        }
-
-        if (j == 9){
-            i += 1;
-            j = 0;
-        }
-    }
-
-    fclose(file);
-    return grid[i][j];
+    if(toto =='.')
+        toto='0';
+    printf("%c", toto);
+    return (int)(toto - '0');
 }
 
 size_t my_str_len(char str[]){
@@ -167,7 +143,6 @@ void write_file(char *file_name, int grid[9][9]){
 
             if ((j + 1) % 3 == 0 && (j != 8))
                 fputc(32,file);
-
         }
 
         if ((i + 1) % 3 == 0)
@@ -183,45 +158,67 @@ void write_file(char *file_name, int grid[9][9]){
 
 int main(int argc,  char *argv[]){
 
-    if(strtoul(argv[1],NULL,10)==0)
-        errx(1,"Error");
-
-    if (argc!=2)
+    if (argc>2||argc<2)
         errx(1,"The number of arguments is not valid");
 
-    unsigned long test = strtoul(argv[1],NULL,10);
+    char toto[9][9];
+    int good_one[9][9];
+    int i=0,j=0,c;
 
-    if(test==0)
-        errx(1,"The parameter is not valid");
+    FILE *file = NULL;
+    file = fopen(argv[1], "r");
+    if(file == NULL)
+        exit(1);
 
+    //IT WORKS PERFECTLY
+    while((c = (fgetc(file))) != EOF){
 
+        if(i==9){
+            i=0;
+            j+=1;
+            //printf("\n");
+        }
 
-    /*int i, j;
-    int grid [9][9]= {{0, 2, 0, 0, 0, 0, 6, 0, 9},
-                      {8, 5, 7, 0, 6, 4, 2, 0, 0},
-                      {0, 9, 0, 0, 0, 1, 0, 0, 0},
-                      {0, 1, 0, 6, 5, 0, 3, 0, 0},
-                      {0, 0, 8, 1, 0, 3, 5, 0, 0},
-                      {0, 0, 3, 0, 2, 9, 0, 8, 0},
-                      {0, 0, 0, 4, 0, 0, 0, 6, 0},
-                      {0, 0, 2, 8, 7, 0, 1, 3, 5},
-                      {1, 0, 6, 0, 0, 0, 0, 2, 0}
-                    };
-
-    if(Solve_Sudoku(grid, 0, 0)){
-
-        printf("\n+-----+-----+-----+\n");
-
-        for(i=1; i<10; ++i){
-
-            for(j=1; j<10; ++j) printf("|%d", grid[i-1][j-1]);
-            printf("|\n");
-
-            if (i%3 == 0) printf("+-----+-----+-----+\n");
+        if(c == ' ' || c == '\r' || c=='\n' || c=='\f' || c=='\0')
+            continue;
+        else{
+            toto[j][i]= c;
+            i++;
+            //printf("%c",c);
         }
     }
-    else
-        printf("\n\nNO SOLUTION\n\n");*/
+    printf("\n\n=========================================\n");
+    
+    //WORK TO NO PROBLEME C'EST BIEN DES CHAR ET C'EST LES BONS
+    /*for(int x=0; x<9; x++){
+        for(int y=0; y<9;y++){
+            printf("%c", toto[x][y]);
+        }
+        printf("\n");
+    }*/
+    printf("\n\n=========================================\n");
+
+    //NE MARCHE PAS ENCORE
+    for(int x=0; x<9; x++){
+        for(int y=0; y<9; y++){
+            //printf("%c:", toto[x][y]);
+            //num = change_dot(toto[i][j]);
+            //printf("%i  ", num);
+            //good_one[i][j] = num;
+            good_one[i][j] = (toto[i][j] - '0');
+            printf("%i  ", good_one[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n\n=========================================\n");
+
+    for(int x=0; x<9; x++){
+        for(int y=0; y<9; y++){
+            printf("%i ", good_one[x][y]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }
