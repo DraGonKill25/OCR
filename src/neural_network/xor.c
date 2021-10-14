@@ -1,151 +1,177 @@
-#include <stdlib.h> //rando() fct
 #include <stdio.h>
+#include <stdlib.h> 
+#include <time.h>
 #include <math.h>
-#include <assert.h>
+#include <fcntl.h>
 
-	//softmax function
-static void softmax(double *input, int input_len)
+//Xor initilization
+
+//number of training pattern
+#define NUMPAT 4
+
+//number of input cells
+#define NUMIN  2
+
+//number of hidden layer cells
+#define NUMHID 2
+
+//number of output cells
+#define NUMOUT 1
+
+//double numbers generator function
+#define rando() ((double)rand()/((double)RAND_MAX+1))
+
+int main()
 {
-	assert (input != NULL);
-	assert (input_len != 0);
-	double m;
+    int    i, j, k, p, np, op, ranpat[NUMPAT+1], epoch;
+    int    NumPattern = NUMPAT, NumInput = NUMIN, NumHidden = NUMHID, NumOutput = NUMOUT;
+    
+    double Input[NUMPAT+1][NUMIN+1] = { {0, 0, 0},  {0, 0, 0},  {0, 1, 0},  {0, 0, 1},  {0, 1, 1} };
+    double Target[NUMPAT+1][NUMOUT+1] = { {0, 0},  {0, 0},  {0, 1},  {0, 1},  {0, 0} };
+   
+    double SumH[NUMPAT+1][NUMHID+1], WeightIH[NUMIN+1][NUMHID+1], Hidden[NUMPAT+1][NUMHID+1];
+    double SumO[NUMPAT+1][NUMOUT+1], WeightHO[NUMHID+1][NUMOUT+1], Output[NUMPAT+1][NUMOUT+1];
+    
+    //Back propagation weights
+    double DeltaO[NUMOUT+1], SumDOW[NUMHID+1], DeltaH[NUMHID+1];
+    double DeltaWeightIH[NUMIN+1][NUMHID+1], DeltaWeightHO[NUMHID+1][NUMOUT+1];
+    
+    double Error, eta = 0.5, alpha = 0.9, smallwt = 0.5;
+    
+  	// initialize WeightIH and DeltaWeightIH
+    for(j = 1; j <= NumHidden ; j++)
+    {    
+        for(i = 0 ; i <= NumInput; i++) 
+        { 
+            DeltaWeightIH[i][j] = 0.0;
+            WeightIH[i][j] = 2.0 * (rando() - 0.5) * smallwt;
+        }
+    }
+    
+    // initialize WeightHO and DeltaWeightHO
+    for(k = 1 ; k <= NumOutput ; k ++)
+    {    
+        for( j = 0; j <= NumHidden; j++) 
+        {
+            DeltaWeightHO[j][k] = 0.0;              
+            WeightHO[j][k] = 2.0 * (rando() - 0.5) * smallwt;
+        }
+    }
+     
+    for(epoch = 0; epoch < 100000; epoch++)
+    {    // iterate weight updates
+        for(p = 1; p <= NumPattern ; p++ )
+        {    // randomize order of training patterns
+            ranpat[p] = p;
+        }
+        for(p = 1 ; p <= NumPattern; p++)
+        {
+            np = p + rando() * (NumPattern + 1 - p);
+            op = ranpat[p]; ranpat[p] = ranpat[np]; ranpat[np] = op;
+        }
+        
+        Error = 0.0 ;
+        
+        // repeat for all the training patterns
+        for(np = 1; np <= NumPattern; np++)
+        {    
+            p = ranpat[np];
+            
+            // compute hidden unit activations
+            for(j = 1; j <= NumHidden; j++)
+            {    
+                SumH[p][j] = WeightIH[0][j];
+                for(i = 1 ; i <= NumInput; i++)
+                {
+                    SumH[p][j] += Input[p][i] * WeightIH[i][j];
+                }
+                Hidden[p][j] = 1.0/(1.0 + exp(-SumH[p][j]));
+            }
+            
+            // compute output unit activations and errors
+            for(k = 1; k <= NumOutput; k++)
+            {    
+                SumO[p][k] = WeightHO[0][k];
+                for(j = 1; j <= NumHidden; j++) 
+                {
+                    SumO[p][k] += Hidden[p][j] * WeightHO[j][k];
+                }
+                Output[p][k] = 1.0/(1.0 + exp(-SumO[p][k])) ;   // Sigmoidal Outputs
+                Error += 0.5 * (Target[p][k] - Output[p][k]) * (Target[p][k] - Output[p][k]) ;
+                DeltaO[k] = (Target[p][k] - Output[p][k]) * Output[p][k] * (1.0 - Output[p][k]) ;
 
-	//max value from input array
-
-	m = input[0];
-	
-	for (int i = 1; i < input_len; i++)
-	{
-		if (input[i] > m)
-		{	
-			m = input[i];
-		}
-	}
-	
-	double sum = 0;
-	
-	for (int i = 0; i < input_len; i++)
-	{
-		sum += expf(input[i]-m);
-	}
-
-	for(int i = 0; i < input_len; i++)
-	{
-		input[i] = expf(input[i] - m - log(sum));
-	}
-}
-
-//Number of inputs
-	#define numInput 2;
-
-	//Number of hidden layers
-	#define numHidden 1;
-
-	//Number of output layers
-	#define numOutput 1;
-
-	//number of training pattern
-	#define numPattern 4;
-
-int main() {
-	
-	//training pattern
-	double target[4][1] = {
-		{1},
-		{1},
-		{0},
-		{0}};
-
-
-	double input[numInput];
-
-	double sumH[numHidden];
-
-	double hidden[numHidden];
-
-	double weightIH[numInput][numHidden];
-
-	double weightHO[numHidden][1];
-	
-	double deltaweightHO[][];
-
-	double output[1];
-
-	double sumH[numHidden];
-	double sumO[numO];
-
-	double deltaweightIH[numInput][numHidden];
-	double deltaweightHO[numHidden][numOutput];
-
-
-
-	//xor learn and training
-
-
-	for(size_t epoch = 1; epoch < 5000; epoch++)
-	{
-		float Error = 0.0;
-
-		for (size_t p = 1; p <= numPattern; p++)
-		{
-			for(size_t j = 1; j <= numHidden; j++)
-			{
-				sumH[p][j] = weightIH[0][j];
-				
-				for(size_t i = 1; i <= numInput; i++)
-				{
-					sumH[p][j] += input[p][i] * weightIH[i][j];
-				}
-				hidden[p][j] = 1.0/(1.0 + exp(-sumH[p][j]));
-			}
-
-			for(size_t k = 1; k <= numOutput; k++)
-			{
-				sumO[p][k] = weightHO[0][k];
-
-				for(size_t j = 1; j <= numHidden; j++)
-				{
-					sumO[p][k] += hidden[p][j] * weightHO[j][k];
-				}
-				output[p][k] = 1.0/(1.0 + exp(-sumO[p][k]));
-				Error += 0.5 * (target[p][k] - output[p][k]) * (target[p][k] - output[p][k]);
-				DeltaO[k] = (target[p][k] - output[p][k]) * ouput[p][k] * (1.0 - output[p][k]);
-
-			}
-			
-			for(size_t j = 1; j <= numHidden; j++)
-			{
-				sumDOW[j] = 0.0;
-
-				for(size_t k = 1; k <= numOutput; k++)
-				{
-					sumDOW[j] += weightHO[j][k] * DeltaO[k];
-				}
-				deltaH[j] = sumDOW[j] * hidden[p][j] * (1.0 - hidden[p][j]);
-				weightIH[0][j] += deltaweightIH[0][j];
-
-				for(size_t i = 1; i <= numInput; i++)
-				{
-					deltaweightIH[i][j] = eta * deltaH[j] + alpha * deltaweightIH[0][j];
-					weightIH[i][j] += deltaweightIH[i][j];
-				}
-			}
-
-			for (size_t k = 1; k <= numOutput; k++)
-			{
-				deltaweightHO[0][k] = eta * deltaO[k] + alpha * deltaweightHO[0][k];
-				weightHO[0][k] += deltaweightHO[0][k];
-
-				for(size_t j = 1; j <= numHidden; j++)
-				{
-					deltaweightHO[j][k] = eta * hidden[p][j] * deltaO[k] + alpha * deltaweightHO[j][k];
-					weightHO[j][k] += deltaweightHO[j][k];
-				}
-			}
-		}
-
-		if(Error < 0.10) break; //when the error is minimum, the xor learnt
-	}
-	
-	return 0;
+            }
+            
+            // 'back-propagate' errors to hidden layer
+            for(j = 1; j <= NumHidden; j++) 
+            {    
+                SumDOW[j] = 0.0;
+                
+                for( k = 1; k <= NumOutput ; k++)
+                {
+                    SumDOW[j] += WeightHO[j][k] * DeltaO[k];
+                }
+                
+                DeltaH[j] = SumDOW[j] * Hidden[p][j] * (1.0 - Hidden[p][j]);
+            }
+            
+            // update weights WeightIH
+            for(j = 1; j <= NumHidden; j++)
+            {     
+                DeltaWeightIH[0][j] = eta * DeltaH[j] + alpha * DeltaWeightIH[0][j];
+                WeightIH[0][j] += DeltaWeightIH[0][j];
+                
+                for(i = 1; i <= NumInput; i++ )
+                { 
+                    DeltaWeightIH[i][j] = eta * Input[p][i] * DeltaH[j] + alpha * DeltaWeightIH[i][j];
+                    WeightIH[i][j] += DeltaWeightIH[i][j];
+                }
+            }
+            
+            // update weights WeightHO
+            for(k = 1; k <= NumOutput; k ++)
+            {    
+                DeltaWeightHO[0][k] = eta * DeltaO[k] + alpha * DeltaWeightHO[0][k];
+                WeightHO[0][k] += DeltaWeightHO[0][k] ;
+                for(j = 1; j <= NumHidden; j++ )
+                {
+                    DeltaWeightHO[j][k] = eta * Hidden[p][j] * DeltaO[k] + alpha * DeltaWeightHO[j][k];
+                    WeightHO[j][k] += DeltaWeightHO[j][k];
+                }
+            }
+        }
+        
+        if( epoch%500 == 0 ) fprintf(stdout, "\nEpoch %-5d :   Error = %f", epoch, Error) ;
+        if( Error < 0.0001 ) break ;  // stop learning when 'near enough'
+    }
+    
+    // print network outputs
+    fprintf(stdout, "\n\nNETWORK DATA - EPOCH %d\n\nPat\t", epoch);   
+    
+    for(i = 1; i <= NumInput; i++ )
+    {
+        fprintf(stdout, "Input%-4d\t", i);
+    }
+    
+    for(k = 1; k <= NumOutput; k++)
+    {
+        fprintf(stdout, "Target%-4d\tOutput%-4d\t", k, k);
+    }
+    
+    for(p = 1; p <= NumPattern; p++)
+    {        
+    	fprintf(stdout, "\n%d\t", p);
+    	
+        for(i = 1; i <= NumInput; i++)
+        {
+            fprintf(stdout, "%f\t", Input[p][i]);
+        }
+        
+        for(k = 1; k <= NumOutput ; k++)
+        {
+            fprintf(stdout, "%f\t%f\t", Target[p][k], Output[p][k]);
+        }
+    }
+    fprintf(stdout, "\n\nGoodbye!\n\n");
+    return 1 ;
 }
