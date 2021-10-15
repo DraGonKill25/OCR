@@ -119,12 +119,13 @@ void write_file(char file_name, int grid[9][9]){
 
     for (size_t i = 0; i < l; i++)
         result_name[i] = file_name[i];
+    
+    result_name += ".result";
 
+    //char extension[] = ".result";
 
-    char extension[] = ".result";
-
-    for (size_t i = 0; i < my_str_len(extension); i++)
-        result_name[l + i] = extension[i];
+    /*for (size_t i = 0; i < my_str_len(extension); i++)
+        result_name[l + i] = extension[i];*/
 
 
     result_name[l + 7] = '\0'; //last caractere 0: end of the string
@@ -210,13 +211,14 @@ int main(int argc,  char *argv[]){
 
     if(Solve_Sudoku(good_one, 0, 0))
     {
-        printf("\n+-----+-----+-----+\n");
+        /*printf("\n+-----+-----+-----+\n");
         for(int h=0; h<9; h++)
         {
             for(int w=0; w<9; w++) printf("|%d", good_one[h][w]);
             printf("|\n");
             if ((h+1)%3 == 0) printf("+-----+-----+-----+\n");
-        }
+        }*/
+        write_file(argv[1], good_one);
     }
     else printf("\n\nNO SOLUTION\n\n");
 
