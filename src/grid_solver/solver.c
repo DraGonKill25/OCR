@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
+#include <string.h>
 
 
 
@@ -27,9 +28,9 @@ int Grid_Check(int grid[9][9],int row, int col, int num);
 //-----------------------------------------
 
 
-//void change_dot(char *file_name, int grid[9][9]);
-size_t my_str_len(char str[]);
-void write_file(char *file_name, int grid[9][9]);
+int change_dot(char toto);
+size_t my_str_len(char str);
+void write_file(char file_name, int grid[9][9]);
 
 //------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -96,36 +97,37 @@ int Solve_Sudoku(int grid[9][9], int row, int col){
 int change_dot(char toto){
 
     if(toto =='.')
-        toto='0';
-    printf("%c", toto);
+        return 0;
     return (int)(toto - '0');
 }
 
-size_t my_str_len(char str[]){
+size_t my_str_len(char str){
 
-    size_t len = 0;
-    while (str[len] != '\0')
-        len += 1;
+    //size_t len = 0;
+    //char string[] = str;
+    //while (string[len] != '\0')
+        //len += 1;
 
-    return len;
+    return 1;
 }
 
-void write_file(char *file_name, int grid[9][9]){
-//create le the file name in a good format
+void write_file(char file_name, int grid[9][9]){
 
-    char result_name[my_str_len(file_name) + 7 + 1];
+    //create the file name in a good format
+    int l = strlen(file_name)/*my_str_len(file_name);*/
+    char result_name[l+8];
 
-    for (size_t i = 0; i < my_str_len(file_name); i++)
+    for (size_t i = 0; i < l; i++)
         result_name[i] = file_name[i];
 
 
     char extension[] = ".result";
 
     for (size_t i = 0; i < my_str_len(extension); i++)
-        result_name[my_str_len(file_name) + i] = extension[i];
+        result_name[l + i] = extension[i];
 
 
-    result_name[my_str_len(file_name) + 7] = '\0'; //last caractere 0: end of the string
+    result_name[l + 7] = '\0'; //last caractere 0: end of the string
 
 
 //end of the writing file name
@@ -133,7 +135,7 @@ void write_file(char *file_name, int grid[9][9]){
 
     FILE *file;
     file = fopen(result_name, "w");
-
+    
 
     for (size_t i = 0; i < 9; i++){
 
@@ -176,7 +178,6 @@ int main(int argc,  char *argv[]){
         if(i==9){
             i=0;
             j+=1;
-            //printf("\n");
         }
 
         if(c == ' ' || c == '\r' || c=='\n' || c=='\f' || c=='\0')
@@ -184,41 +185,40 @@ int main(int argc,  char *argv[]){
         else{
             toto[j][i]= c;
             i++;
-            //printf("%c",c);
         }
     }
-    printf("\n\n=========================================\n");
-    
-    //WORK TO NO PROBLEME C'EST BIEN DES CHAR ET C'EST LES BONS
-    /*for(int x=0; x<9; x++){
-        for(int y=0; y<9;y++){
-            printf("%c", toto[x][y]);
-        }
-        printf("\n");
-    }*/
-    printf("\n\n=========================================\n");
-
-    //NE MARCHE PAS ENCORE
-    for(int x=0; x<9; x++){
-        for(int y=0; y<9; y++){
-            //printf("%c:", toto[x][y]);
-            //num = change_dot(toto[i][j]);
-            //printf("%i  ", num);
-            //good_one[i][j] = num;
-            good_one[i][j] = (toto[i][j] - '0');
-            printf("%i  ", good_one[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\n\n=========================================\n");
 
     for(int x=0; x<9; x++){
         for(int y=0; y<9; y++){
-            printf("%i ", good_one[x][y]);
+            good_one[x][y] = (change_dot(toto[x][y]));
+            //printf("%i", good_one[x][y]);
         }
-        printf("\n");
+        //printf("\n");
     }
+
+
+    /*if(!Solve_Sudoku(good_one, row, col))
+        errx(1,"The grid is impossible to solve");
+    else
+        for(int x=0; x<9; x++){
+            for(int y=0; y<9; y++){
+                //good_one[x][y] = (change_dot(toto[x][y]));
+                printf("%i", good_one[x][y]);
+            }
+            printf("\n");
+        }*/
+
+    if(Solve_Sudoku(good_one, 0, 0))
+    {
+        printf("\n+-----+-----+-----+\n");
+        for(int h=0; h<9; h++)
+        {
+            for(int w=0; w<9; w++) printf("|%d", good_one[h][w]);
+            printf("|\n");
+            if ((h+1)%3 == 0) printf("+-----+-----+-----+\n");
+        }
+    }
+    else printf("\n\nNO SOLUTION\n\n");
 
     return 0;
 }
