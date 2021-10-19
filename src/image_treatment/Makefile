@@ -2,7 +2,7 @@ CC=gcc
 CPPFLAGS=
 CFLAGS=-Wall -Wextra -Werror -std=c99
 LDFLAGS=
-LDLIBS=-lSDL2_image -lSDL2 -lm
+LDLIBS=-lSDL_image -lSDL_gfx -lSDL -lm
 EXEC=imagetreatment
 
 SRC= image_treatment.c

@@ -1,35 +1,97 @@
 //Using SDL and standard IO
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_rotozoom.h>
 #include <stdio.h>
 #include <err.h>
 #include <math.h>
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
 //Constants
-const double M_PI = 3.14159265358979323846;
+const double PI = 3.14159265358979323846;
 
 //Functions
 SDL_Surface * colorTreatment(SDL_Surface *image);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
 
+Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
+{
+    int bpp = surf->format->BytesPerPixel;
+    return (Uint8*)surf->pixels + y * surf->pitch + x * bpp;
+}
+
+Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
+{
+    Uint8 *p = pixel_ref(surface, x, y);
+
+    switch (surface->format->BytesPerPixel)
+    {
+        case 1:
+            return *p;
+
+        case 2:
+            return *(Uint16 *)p;
+
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return p[0] << 16 | p[1] << 8 | p[2];
+            else
+                return p[0] | p[1] << 8 | p[2] << 16;
+
+        case 4:
+            return *(Uint32 *)p;
+    }
+
+    return 0;
+}
+
+void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
+{
+    Uint8 *p = pixel_ref(surface, x, y);
+
+    switch(surface->format->BytesPerPixel)
+    {
+        case 1:
+            *p = pixel;
+            break;
+
+        case 2:
+            *(Uint16 *)p = pixel;
+            break;
+
+        case 3:
+            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            {
+                p[0] = (pixel >> 16) & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = pixel & 0xff;
+            }
+            else
+            {
+                p[0] = pixel & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = (pixel >> 16) & 0xff;
+            }
+            break;
+
+        case 4:
+            *(Uint32 *)p = pixel;
+            break;
+    }
+}
+
 
 SDL_Surface * colorTreatment(SDL_Surface *image)
 {
 	int i, j;
-	SDL_LockSurface(image);
-	Uint32 *pixels = image->pixels;
+    SDL_LockSurface(image);
 	int h = image->h;
 	int w = image->w;
-	SDL_PixelFormat *Format = image->format;
+    SDL_PixelFormat* Format = image->format;
 	for(i = 0; i < h; i++)
 	{
     	for(j = 0; j < w; j++)
 		{
-        	pixels[i * w + j] = blackAndwhite(pixels[i * w + j], Format);
+        	put_pixel(image,j,i,blackAndwhite(get_pixel(image,j,i), Format));
 		}
 	}
 	SDL_UnlockSurface(image);
@@ -61,7 +123,7 @@ SDL_Surface * colorTreatment(SDL_Surface *image)
     return Returned;
 }
 */
-
+/*
 void Rotate(SDL_Surface* img, double angle)
 {
     //int n_w, n_h;
@@ -99,7 +161,7 @@ void Rotate(SDL_Surface* img, double angle)
     *img = *new_img;
     SDL_FreeSurface(new_img);
 }
-
+*/
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
 {
 	Uint8 r;
@@ -129,9 +191,6 @@ int main( int argc, char* args[] )
     }
 
 
-    //The window we'll be rendering to
-    SDL_Window * window = NULL;
-
     //The surface contained by the window
     SDL_Surface * screenSurface = NULL;
 
@@ -154,36 +213,33 @@ int main( int argc, char* args[] )
 	    else
 	    {
 		    //Create window
-        	window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,Loaded->w , Loaded->h, SDL_WINDOW_SHOWN );
-        	if( window == NULL )
+        	screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32, SDL_SWSURFACE );
+        	if(!screenSurface)
         	{
             	printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
         	}
 		    else
         	{
-            	//Get window surface
-            	screenSurface = SDL_GetWindowSurface( window );
-
-	    
+                
 	    		//Blit the Loaded image over the window's surface
 			    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
-
             	//Update the surface
-            	SDL_UpdateWindowSurface( window );
+            	SDL_Flip(screenSurface);
 			    SDL_Delay(2000);
 
 			    //Treat the loaded image
 			    colorTreatment(Loaded);
 
 			    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
-			    SDL_UpdateWindowSurface( window );
+			    SDL_Flip(screenSurface);
 
                 SDL_Delay(2000);
 
-                Rotate(Loaded, 90);
-
+                Loaded = rotozoomSurface(screenSurface, 30, 1, 1);
+                screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32, SDL_SWSURFACE);
+                                
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
-                SDL_UpdateWindowSurface( window );
+                SDL_Flip(screenSurface);
 
 
             	//Wait two seconds
@@ -191,11 +247,8 @@ int main( int argc, char* args[] )
 		    }
 	    }
     }
+    SDL_FreeSurface( screenSurface );
     SDL_FreeSurface( Loaded );
-    Loaded = NULL;
-
-    //Destroy window
-    SDL_DestroyWindow( window );
 
     //Quit SDL subsystems
     SDL_Quit();
