@@ -3,9 +3,9 @@ CPPFLAGS=
 CFLAGS=-Wall -Wextra -Werror -std=c99
 LDFLAGS=
 LDLIBS=-lSDL2_image -lSDL2 -lm
-EXEC=imagetreatment
+EXEC=Image_splitting
 
-SRC= image_treatment.c
+SRC= Image_Splitting.c
 OBJ= ${SRC:.c=.o}
 
 all: ${EXEC}

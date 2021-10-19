@@ -1,5 +1,8 @@
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
-#include <SDL.h>
+#include <err.h>
+#include <math.h>
 
 SDL_Surface * colorTreatment(SDL_Surface *image);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
