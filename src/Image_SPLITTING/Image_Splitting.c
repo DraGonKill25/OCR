@@ -12,6 +12,7 @@ int *_ygrille = NULL;
 int *_xfinal = NULL;
 int *_yfinal = NULL;
 int *_L = NULL;
+SDL_Surface* new_List[9][9];
 
 //Functions
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
@@ -85,9 +86,8 @@ SDL_Surface* IMAGE_SPLITTING(SDL_Surface* src,int x,int y)
 // Return the list of all Images Splitting
 // This list is a matrix[9][9], the images are organised like in The Array initial 
 // x0 = the most left x, x1 = the most right x, y0 = the most top y, y1 = the most low y 
- SDL_Surface* list_Splitting(SDL_Surface *image)
+SDL_Surface*** list_Splitting(SDL_Surface *image)
 {
-    SDL_Surface* new_List[9][9];
     int L = *_L;
     int y = *_ygrille;
     while (y < *_yfinal)
@@ -100,7 +100,7 @@ SDL_Surface* IMAGE_SPLITTING(SDL_Surface* src,int x,int y)
             }
         y += L/9;
     }
-    return new_List; // retourne bonne image
+    return (SDL_Surface***) new_List; // retourne bonne image
 }
 
 
