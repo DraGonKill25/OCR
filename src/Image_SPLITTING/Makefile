@@ -19,4 +19,4 @@ ${EXEC}: ${OBJ}
 
 
 clean:
-	rm -f ${OBJ} ${EXEC}
+	rm -f ${OBJ} ${EXEC} Image_splitting *.swp *.swo .swn

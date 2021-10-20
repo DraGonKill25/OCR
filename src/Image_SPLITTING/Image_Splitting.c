@@ -1,8 +1,9 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <stdio.h>
-#include <err.h>
 #include <math.h>
+#include <err.h>
+#include "SDL/SDL.h"
+#include "SDL/SDL_image.h"
+#include <stdlib.h>
 
 SDL_Surface * colorTreatment(SDL_Surface *image);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
@@ -12,9 +13,76 @@ int *_ygrille = NULL;
 int *_xfinal = NULL;
 int *_yfinal = NULL;
 int *_L = NULL;
-SDL_Surface* new_List[9][9];
+//SDL_Surface* new_List[9][9];
 
 //Functions
+
+
+void init_sdl()
+{
+    // Init only the video part.
+    // If it fails, die with an error message.
+    if(SDL_Init(SDL_INIT_VIDEO) == -1)
+        errx(1,"Could not initialize SDL: %s.\n", SDL_GetError());
+}
+
+SDL_Surface* load_image(char *path)
+{
+    SDL_Surface *img;
+
+    // Load an image using SDL_image with format detection.
+    // If it fails, die with an error message.
+    img = IMG_Load(path);
+    if (!img)
+        errx(3, "can't load %s: %s", path, IMG_GetError());
+
+    return img;
+}
+
+SDL_Surface* display_image(SDL_Surface *img)
+{
+    SDL_Surface *screen;
+
+    // Set the window to the same size as the image
+    screen = SDL_SetVideoMode(img->w, img->h, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+    if (screen == NULL)
+    {
+        // error management
+        errx(1, "Couldn't set %dx%d video mode: %s\n",
+                img->w, img->h, SDL_GetError());
+    }
+
+    // Blit onto the screen surface
+    if(SDL_BlitSurface(img, NULL, screen, NULL) < 0)
+        warnx("BlitSurface error: %s\n", SDL_GetError());
+
+    // Update the screen
+    SDL_UpdateRect(screen, 0, 0, img->w, img->h);
+
+    // return the screen for further uses
+    return screen;
+}
+
+void wait_for_keypressed()
+{
+    SDL_Event event;
+
+    // Wait for a key to be down.
+    do
+    {
+        SDL_PollEvent(&event);
+    } while(event.type != SDL_KEYDOWN);
+
+    // Wait for a key to be up.
+    do
+    {
+        SDL_PollEvent(&event);
+    } while(event.type != SDL_KEYUP);
+}
+
+
+
+
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
 {
     int bpp = surf->format->BytesPerPixel;
@@ -60,13 +128,14 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 
 }
 
+
 // create a new Image with the width and height of L/9
 // the Image is a square of a Sudoku that takes place in x and y
 // Splitting not the Image but the Image of the square
 
 SDL_Rect dstrect;
 
-SDL_Surface* IMAGE_SPLITTING(SDL_Surface* src,int x,int y)
+void/*SDL_Surface**/ IMAGE_SPLITTING(SDL_Surface* src,int x,int y, char *file_name)
 {
     int L = *_L;
     SDL_Surface* dst = SDL_CreateRGBSurface(0, L /  9,L / 9,32,0,0,0,0);
@@ -79,28 +148,38 @@ SDL_Surface* IMAGE_SPLITTING(SDL_Surface* src,int x,int y)
 
     SDL_BlitSurface(src, &srcrect, dst, NULL);
     // sdl unlock surface
-    return dst;
-}
+    // //return dst;
 
+    SDL_SaveBMP(dst,file_name);
+}
 
 // Return the list of all Images Splitting
 // This list is a matrix[9][9], the images are organised like in The Array initial 
 // x0 = the most left x, x1 = the most right x, y0 = the most top y, y1 = the most low y 
-SDL_Surface*** list_Splitting(SDL_Surface *image)
+void list_Splitting(SDL_Surface *image)
 {
     int L = *_L;
     int y = *_ygrille;
+    int indexy = 0;
     while (y < *_yfinal)
     {
         int x = *_xgrille;
+        int indexx = 0;
         while (x < *_xfinal)
             {
-                new_List[x][y] = (IMAGE_SPLITTING(image,x,y));
+                char text[20] = "case_";
+                sprintf( text, "%i", x);
+                sprintf(text, "%i", y);
+                sprintf(text,"%s", ".jpg");
+                
+                (IMAGE_SPLITTING(image,x,y, text));
                 x += L/9;
+                indexx++;
+                
             }
+        indexy++;
         y += L/9;
     }
-    return (SDL_Surface***) new_List; // retourne bonne image
 }
 
 
@@ -169,7 +248,8 @@ int Good_research(SDL_Surface *image,int x,int y){
     }
 }
 
-
+// 
+//
 int search_grille(SDL_Surface *image)
 {
     int x= 0;
@@ -191,5 +271,50 @@ int search_grille(SDL_Surface *image)
     return 0;
 }
 
+int main( int argc, char* args[] ){
+    if (argc)
+    {
+        
+    }
+    if (args)
+    {
+        
+    }
+     SDL_Surface * Loaded = NULL;
 
 
+
+
+    Loaded=IMG_Load("image_03.jpeg");
+
+    search_grille(Loaded);
+    list_Splitting(Loaded);
+
+
+    SDL_Surface* image_surface;
+    SDL_Surface* screen_surface;
+
+    init_sdl();
+
+   
+
+    for(int x = 0; x < 9;x++){
+        for(int y = 0; y < 9;y++){
+            char text[20] = "case_";
+            sprintf( text, "%i", x);
+            sprintf(text, "%i", y);
+            sprintf(text,"%s", ".jpg");
+
+            image_surface = load_image(text);
+            screen_surface = display_image(image_surface);
+
+            wait_for_keypressed();
+        }
+    }
+
+    SDL_FreeSurface(image_surface);
+    SDL_FreeSurface(screen_surface);
+
+    return 0;
+
+} 
