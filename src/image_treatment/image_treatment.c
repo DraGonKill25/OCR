@@ -4,13 +4,12 @@
 #include <SDL/SDL_rotozoom.h>
 #include <stdio.h>
 #include <err.h>
-#include <math.h>
 
 //Constants
 const double PI = 3.14159265358979323846;
 
 //Functions
-SDL_Surface * colorTreatment(SDL_Surface *image);
+void colorTreatment(SDL_Surface *image);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
 
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
@@ -19,6 +18,8 @@ Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
     return (Uint8*)surf->pixels + y * surf->pitch + x * bpp;
 }
 
+
+// get the pixel data depending on the format used
 Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
 {
     Uint8 *p = pixel_ref(surface, x, y);
@@ -44,6 +45,9 @@ Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
     return 0;
 }
 
+
+// Put the given pixel in the surface at the coordinates (x,y)
+// Adapting to the format of the image
 void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
 {
     Uint8 *p = pixel_ref(surface, x, y);
@@ -79,8 +83,9 @@ void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
     }
 }
 
-
-SDL_Surface * colorTreatment(SDL_Surface *image)
+// Simple function applying a treatment to every pixel in an image
+// in this case it is a Blackscale treatment and directly modify the image
+void colorTreatment(SDL_Surface *image)
 {
 	int i, j;
     SDL_LockSurface(image);
@@ -95,73 +100,9 @@ SDL_Surface * colorTreatment(SDL_Surface *image)
 		}
 	}
 	SDL_UnlockSurface(image);
-	return image;
 }
 
-/* SDL_Surface * surfaceRotation(SDL_Surface *image, double angle)
-{
-    int i, j;
-   // SDL_PixelFormat* Imgformat = image->format;
-    SDL_Surface *Returned = 
-    SDL_CreateRGBSurfaceFrom(image->pixels,image->w,image->h,32,image->pitch,0,0,0,0);
-    SDL_LockSurface(Returned);
-    Uint32 *Dstpixels = Returned->pixels;
-    Uint32 *Srcpixels = image->pixels;
-    int w = image->w;
-    int h = image->h;
-
-    for(i = 0; i < h; i++)
-    {
-        for(j = 0; j < w; j++)
-        {
-
-            Dstpixels[i * w + j] = Srcpixels[(i*(int)cos(angle)-j*(int)sin(angle)) * w +
-            (j*(int)cos(angle) + i*(int)sin(angle))];
-        }
-    }
-    SDL_UnlockSurface(Returned);
-    return Returned;
-}
-*/
-/*
-void Rotate(SDL_Surface* img, double angle)
-{
-    //int n_w, n_h;
-
-    //GetNewSize(img, angle, &n_h, &n_w);
-
-    SDL_Surface* new_img = SDL_CreateRGBSurface(0, img -> w, img -> h, 32, 0, 0, 0, 0);
-    int center_x = img -> w / 2;
-    int center_y = img -> h / 2;
-    Uint32 *Dstpixels = new_img->pixels;                                       
-    Uint32 *Srcpixels = img->pixels;   
-    SDL_LockSurface(new_img);
-    angle = angle * M_PI / 180;
-
-    for (int i = 0; i < img -> w; i++)
-    {
-        for (int j = 0; j < img -> h; j++)
-        {
-            int x = (int) ((i - center_x) * cos(angle) - (j - center_y) * sin(angle) + center_x);
-            int y = (int) ((i - center_x) * sin(angle) + (j - center_y) * cos(angle) + center_y);
-
-            if (x >= 0 && y >= 0 && x < img -> w && y < img -> h)
-            {
-                Uint32 pixel = Srcpixels[j * (img->w) + i]; //get_pixel(img, x, y);
-                Dstpixels[y * (img->w) + x] = pixel;        //put_pixel(new_img, i, j, pixel);
-            }
-            else
-            {
-                Uint32 pixel = SDL_MapRGB(img -> format, 255, 255, 255);
-                Dstpixels[j * (img->w) + i] = pixel;        //put_pixel(new_img, i, j, pixel);
-            }
-        }
-    }   
-    SDL_UnlockSurface(new_img);
-    *img = *new_img;
-    SDL_FreeSurface(new_img);
-}
-*/
+// Blackscale function
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
 {
 	Uint8 r;
@@ -178,6 +119,22 @@ Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
     }
 }
 
+void wait_for_keypressed()
+{
+    SDL_Event event;
+
+    // Wait for a key to be down.
+    do
+    {
+        SDL_PollEvent(&event);
+    } while(event.type != SDL_KEYDOWN);
+
+    // Wait for a key to be up.
+    do
+    {
+        SDL_PollEvent(&event);
+    } while(event.type != SDL_KEYUP);
+}
 
 int main( int argc, char* args[] )
 {
@@ -191,20 +148,20 @@ int main( int argc, char* args[] )
     }
 
 
-    //The surface contained by the window
+    //The surface displayed on the window
     SDL_Surface * screenSurface = NULL;
 
-    //The surface loaded
+    //The surface of the image we are gonna load
     SDL_Surface * Loaded = NULL;
 
-    //Initialize SDL
+    //Initialize SDL video module
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
     {
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
     }
     else
     {
-        //Load image
+        //Load image using SDL_image
 	    Loaded=IMG_Load("image_03.jpeg");
 	    if(!Loaded) 
 	    {
@@ -212,7 +169,7 @@ int main( int argc, char* args[] )
 	    }	
 	    else
 	    {
-		    //Create window
+		    //Create a window that is the same size as our image
         	screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32, SDL_SWSURFACE );
         	if(!screenSurface)
         	{
@@ -225,7 +182,7 @@ int main( int argc, char* args[] )
 			    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
             	//Update the surface
             	SDL_Flip(screenSurface);
-			    SDL_Delay(2000);
+			    wait_for_keypressed();
 
 			    //Treat the loaded image
 			    colorTreatment(Loaded);
@@ -233,17 +190,15 @@ int main( int argc, char* args[] )
 			    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
 			    SDL_Flip(screenSurface);
 
-                SDL_Delay(2000);
-
-                Loaded = rotozoomSurface(screenSurface, 30, 1, 1);
-                screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32, SDL_SWSURFACE);
-                                
-                SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
+                wait_for_keypressed();
+                //Rotation and update
+                Loaded = rotozoomSurface(screenSurface, -45, 1, 1);
+                screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32,SDL_SWSURFACE);
+                SDL_BlitSurface(Loaded,NULL,screenSurface,NULL);
                 SDL_Flip(screenSurface);
 
-
-            	//Wait two seconds
-            	SDL_Delay( 2000 );
+            	//Wait for a key to be pressed to end the program
+            	wait_for_keypressed();
 		    }
 	    }
     }

@@ -1,8 +1,8 @@
 CC=gcc
 CPPFLAGS=
-CFLAGS=-Wall -Wextra -Werror -std=c99
+CFLAGS=-Wall -Wextra -Werror -std=c99 $$(pkg-config --cflags sdl SDL_image)
 LDFLAGS=
-LDLIBS=-lSDL2_image -lSDL2 -lm
+LDLIBS=-lm $$(pkg-config --libs sdl SDL_image)
 EXEC=Image_splitting
 
 SRC= Image_Splitting.c
@@ -19,4 +19,4 @@ ${EXEC}: ${OBJ}
 
 
 clean:
-	rm -f ${OBJ} ${EXEC}
+	rm -f ${OBJ} ${EXEC} Image_splitting *.swp *.swo .swn
