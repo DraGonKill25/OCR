@@ -1,8 +1,8 @@
 CC=gcc
 CPPFLAGS=
-CFLAGS=-Wall -Wextra -Werror -std=c99
+CFLAGS=-Wall -Wextra -Werror -std=c99 $$(pkg-config --cflags sdl SDL_image SDL_gfx)
 LDFLAGS=
-LDLIBS=-lSDL_image -lSDL_gfx -lSDL -lm
+LDLIBS=-lm $$(pkg-config --libs sdl SDL_image SDL_gfx)
 EXEC=imagetreatment
 
 SRC= image_treatment.c
