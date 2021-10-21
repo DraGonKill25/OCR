@@ -8,12 +8,6 @@
 SDL_Surface * colorTreatment(SDL_Surface *image);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
 
-int *_xgrille = NULL;
-int *_ygrille = NULL;
-int *_xfinal = NULL;
-int *_yfinal = NULL;
-int *_L = NULL;
-//SDL_Surface* new_List[9][9];
 
 //Functions
 
@@ -133,46 +127,46 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 // the Image is a square of a Sudoku that takes place in x and y
 // Splitting not the Image but the Image of the square
 
-SDL_Rect dstrect;
 
-void/*SDL_Surface**/ IMAGE_SPLITTING(SDL_Surface* src,int x,int y, char *file_name)
-{
-    int L = *_L;
-    SDL_Surface* dst = SDL_CreateRGBSurface(0, L /  9,L / 9,32,0,0,0,0);
-    // sdl lock surface
+
+
+void Split_Image(SDL_Surface* src,int L,int x,int y,char* text){
+    SDL_Surface* dst1 = SDL_CreateRGBSurface(0, L/9,L/9,32,0,0,0,0);
+    
     SDL_Rect srcrect;
+    
     srcrect.x = x;
     srcrect.y = y;
-    srcrect.w = L / 9;
-    srcrect.h = L / 9;
+    srcrect.w = L/9;
+    srcrect.h = L/9;
+    
+    SDL_BlitSurface(src, &srcrect, dst1, NULL);
+   
+    SDL_SaveBMP(dst1,text);
+    }
 
-    SDL_BlitSurface(src, &srcrect, dst, NULL);
-    // sdl unlock surface
-    // //return dst;
 
-    SDL_SaveBMP(dst,file_name);
-}
 
 // Return the list of all Images Splitting
 // This list is a matrix[9][9], the images are organised like in The Array initial 
 // x0 = the most left x, x1 = the most right x, y0 = the most top y, y1 = the most low y 
-void list_Splitting(SDL_Surface *image)
+void list_Splitting(SDL_Surface *image,int x,int y,int L)
 {
-    int L = *_L;
-    int y = *_ygrille;
     int indexy = 0;
-    while (y < *_yfinal)
+    int firstx = x;
+    int firsty = y;
+    while (y < firsty + L)
     {
-        int x = *_xgrille;
+        int x = firstx;
         int indexx = 0;
-        while (x < *_xfinal)
+        while (x < firstx + L)
             {
                 char text[20] = "case_";
                 sprintf( text, "%i", x);
                 sprintf(text, "%i", y);
                 sprintf(text,"%s", ".jpg");
                 
-                (IMAGE_SPLITTING(image,x,y, text));
+                (Split_Image(image,L,x,y, text));
                 x += L/9;
                 indexx++;
                 
@@ -186,7 +180,24 @@ void list_Splitting(SDL_Surface *image)
 // check if there is a Sudoku grid in the x and y position, 
 // we return 0 if the position x and y is not the first of a sudoku grid 
 // we return 1 if the position x and y is the first position of a sudoku grid
-//
+
+
+
+int research_L(SDL_Surface *image, int x,int y)
+{
+     SDL_PixelFormat *Format = image->format;
+
+    int x1 = x;
+    int y1 = y;
+    while (BlackorWhite(get_pixel(image,x1,y1),Format)) // search the lenght of a small square
+            {
+                
+                y1++;
+            }
+    return y1 - y;
+
+
+}
 int Good_research(SDL_Surface *image,int x,int y){
 
     SDL_PixelFormat *Format = image->format;
@@ -202,17 +213,19 @@ int Good_research(SDL_Surface *image,int x,int y){
             return 0;
         if (BlackorWhite(get_pixel(image,x+1,y+1),Format)) // check if the right pixel of the down pixel is white
         {
-            int y1 = y+1;
+           /* int y1 = y+1;
             int x1 = x+ 1;
-            while (BlackorWhite(get_pixel(image,x,y),Format)) // search the lenght of a small square
+            while (BlackorWhite(get_pixel(image,x1,y1),Format)) // search the lenght of a small square
             {
                 x1++;
                 y1++;
             }
-            int l = x1 - x;
+            */
+            int l = research_L(image,x + 1,y + 1);
             int newx = x+1;
             int oldx = x;
-            while ( l < l * 9) //check all the pixel on the width of the grid
+            int oldl = l;
+            while ( l < oldl * 9) //check all the pixel on the width of the grid
             {
                 if(BlackorWhite(get_pixel(image,newx,y),Format))
                     return 0;
@@ -235,11 +248,6 @@ int Good_research(SDL_Surface *image,int x,int y){
                 ((!BlackorWhite(get_pixel(image,2*(x + L/3),2*(y + L/3)),Format))) &&
                 ((!BlackorWhite(get_pixel(image,x + L,y + L),Format))))// check if the pixel of the diagonal of the square are black 
                 {
-                    *_xgrille = x;
-                    *_ygrille = y;
-                    *_xfinal = x + L;
-                    *_yfinal  = y + L;
-                    *_L = L;
                     return 1;
                 }
             
@@ -256,20 +264,26 @@ int search_grille(SDL_Surface *image)
     int y= 0;
     int h = image->h;
     int w = image->w;
+    int newList[] = {0,0};
     while (y < h)
     {
         x = 0;
         while(x < w)
         {
-            if(Good_research(image,x,y))
-                return 1;
+            if(Good_research(image,x,y)){
+                *newList[0] = &x;
+                *newList[1] = &y;
+                return newList;
+            }
             x++;
 
         }
         y++;
     }
-    return 0;
+    return newList;
 }
+
+
 
 int main( int argc, char* args[] ){
     if (argc)
@@ -280,17 +294,24 @@ int main( int argc, char* args[] ){
     {
         
     }
-     SDL_Surface * Loaded = NULL;
+     SDL_Surface * Loaded = NULL; 
 
 
 
+    // load the image 
+    Loaded=load_image("image_03.jpeg");
 
-    Loaded=IMG_Load("image_03.jpeg");
+    int List[] = search_grille(Loaded);
+    int x = List[0];
+    int y = List[1];
+    int l = research_L(Loaded, x + 1, y +1);
+    int L = l * 9;
 
-    search_grille(Loaded);
-    list_Splitting(Loaded);
+    //Split_surface(Loaded);
+    list_Splitting(Loaded,x,y,L);
+    
 
-
+    /*
     SDL_Surface* image_surface;
     SDL_Surface* screen_surface;
 
@@ -314,7 +335,11 @@ int main( int argc, char* args[] ){
 
     SDL_FreeSurface(image_surface);
     SDL_FreeSurface(screen_surface);
+    */
+
+    SDL_FreeSurface(Loaded);
 
     return 0;
 
 } 
+
