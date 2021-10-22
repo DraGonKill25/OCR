@@ -185,14 +185,15 @@ void list_Splitting(SDL_Surface *image,int x,int y,int L)
 
 int research_L(SDL_Surface *image, int x,int y)
 {
-     SDL_PixelFormat *Format = image->format;
-
+    SDL_PixelFormat *Format = image->format;
+    
     int x1 = x;
     int y1 = y;
-    while (BlackorWhite(get_pixel(image,x1,y1),Format)) // search the lenght of a small square
+    int w = image->w;
+    while ((y1  < w) && (BlackorWhite(get_pixel(image,x1,y1),Format))) 
+        // search the length of a small square 
             {
-                
-                y1++;
+                 y1++;
             }
     return y1 - y;
 
@@ -201,6 +202,9 @@ int research_L(SDL_Surface *image, int x,int y)
 int Good_research(SDL_Surface *image,int x,int y){
 
     SDL_PixelFormat *Format = image->format;
+    int h = image->h;
+    int w = image->w;
+
     if (BlackorWhite(get_pixel(image,x,y),Format))
     {
         return 0;
@@ -225,7 +229,7 @@ int Good_research(SDL_Surface *image,int x,int y){
             int newx = x+1;
             int oldx = x;
             int oldl = l;
-            while ( l < oldl * 9) //check all the pixel on the width of the grid
+            while (( newx < h) && ( l < oldl * 9)) //check all the pixel on the width of the grid
             {
                 if(BlackorWhite(get_pixel(image,newx,y),Format))
                     return 0;
@@ -238,19 +242,19 @@ int Good_research(SDL_Surface *image,int x,int y){
             }
             int  L = l*9;
             int newy = y + 1;
-            while ( newy < y + L) //check all the pixel on the lenght of the grid
+            while ((newy < w) &&( newy < y + L)) //check all the pixel on the lenght of the grid
             {
                 if (BlackorWhite(get_pixel(image,x,newy),Format))
                     return 0;
                 newy++;
             }
-            if ((!BlackorWhite(get_pixel(image,x + L/3,y + L/3),Format)) &&
-                ((!BlackorWhite(get_pixel(image,2*(x + L/3),2*(y + L/3)),Format))) &&
-                ((!BlackorWhite(get_pixel(image,x + L,y + L),Format))))// check if the pixel of the diagonal of the square are black 
-                {
-                    return 1;
-                }
-            
+            if(( x + L/3 < h) && ( y + L/3< w) && (2*(x + L/3)< h) && (2*( y +
+                L/3) < w) && ( x + L < h) && ( y + L < w)){
+                    if ((!BlackorWhite(get_pixel(image,x + L/3,y + L/3),Format)) &&
+                    ((!BlackorWhite(get_pixel(image,2*(x + L/3),2*(y + L/3)),Format))) &&
+                    ((!BlackorWhite(get_pixel(image,x + L,y + L),Format))))// check if the pixel of the diagonal of the square are black {
+                        return 1;
+            }
         }
         return 0;
     }
@@ -258,33 +262,30 @@ int Good_research(SDL_Surface *image,int x,int y){
 
 // 
 //
-int** search_grille(SDL_Surface *image, int *List[2])
+void search_grille(SDL_Surface *image, int List[2])
 {
     int x= 0;
     int y= 0;
     int h = image->h;
     int w = image->w;
+    List[0] = h;
+    List[1] = w;
     //int *newList[] = {&h,&w};
-    while (y < h)
+    while (y < h-1)
     {
         x = 0;
-        while(x < w)
+        while(x < w-1)
         {
             if(Good_research(image,x,y)){
                 //int *Listxy[2] = {&x,&y};
-                List[0] = &x;
-                List[1] = &y;
-                return List;
+                List[0] = x;
+                List[1] = y;
             }
             x++;
 
         }
         y++;
     }
-    
-    List[0] = &h;
-    List[1] = &w;
-    return List;
 }
 
 
@@ -305,7 +306,7 @@ int main( int argc, char* args[] ){
     // load the image 
     Loaded=load_image("image_03.jpeg");
 
-    int *List[2];
+    int List[2];
     search_grille(Loaded, List);
     //int *x = List[0];
     //int *y = List[1];
