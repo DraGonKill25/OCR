@@ -186,10 +186,10 @@ int main( int argc, char* args[] )
 
 			    //Treat the loaded image
 			    colorTreatment(Loaded);
-
+                SDL_SaveBMP(Loaded, "BlackAndWhite.bmp");
 			    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
 			    SDL_Flip(screenSurface);
-
+                
                 wait_for_keypressed();
                 //Rotation and update
                 Loaded = rotozoomSurface(screenSurface, -45, 1, 1);
