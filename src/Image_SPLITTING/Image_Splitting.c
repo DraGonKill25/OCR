@@ -258,29 +258,33 @@ int Good_research(SDL_Surface *image,int x,int y){
 
 // 
 //
-int search_grille(SDL_Surface *image)
+int** search_grille(SDL_Surface *image, int *List[2])
 {
     int x= 0;
     int y= 0;
     int h = image->h;
     int w = image->w;
-    int newList[] = {0,0};
+    //int *newList[] = {&h,&w};
     while (y < h)
     {
         x = 0;
         while(x < w)
         {
             if(Good_research(image,x,y)){
-                *newList[0] = &x;
-                *newList[1] = &y;
-                return newList;
+                //int *Listxy[2] = {&x,&y};
+                List[0] = &x;
+                List[1] = &y;
+                return List;
             }
             x++;
 
         }
         y++;
     }
-    return newList;
+    
+    List[0] = &h;
+    List[1] = &w;
+    return List;
 }
 
 
@@ -301,14 +305,19 @@ int main( int argc, char* args[] ){
     // load the image 
     Loaded=load_image("image_03.jpeg");
 
-    int List[] = search_grille(Loaded);
-    int x = List[0];
-    int y = List[1];
-    int l = research_L(Loaded, x + 1, y +1);
-    int L = l * 9;
+    int *List[2];
+    search_grille(Loaded, List);
+    //int *x = List[0];
+    //int *y = List[1];
+    //int true_x = *x;
+    //int true_y = *y;
+    //int l = research_L(Loaded, true_x + 1, true_y +1);
+    //if(l*9 > 56)
+        printf("test");
+    //int L = l * 9;
 
     //Split_surface(Loaded);
-    list_Splitting(Loaded,x,y,L);
+    //list_Splitting(Loaded, true_x, true_y, L);
     
 
     /*
