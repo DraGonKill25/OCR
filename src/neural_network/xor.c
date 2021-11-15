@@ -27,10 +27,20 @@ int main()
     int    NumPattern = NUMPAT, NumInput = NUMIN, NumHidden = NUMHID, NumOutput = NUMOUT;
     
     //array that contains patters 
-    double Input[NUMPAT+1][NUMIN+1] = {{0, 0, 0},{0, 0, 0},{0, 1, 0},{0, 0, 1},{0, 1, 1} };
+    double Input[NUMPAT+1][NUMIN+1] = {    
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 1, 0},
+        {0, 0, 1},
+        {0, 1, 1} };
 
     //array with 
-    double Target[NUMPAT+1][NUMOUT+1] = { {0, 0},{0, 0},{0, 1},{0, 1},{0, 0} };
+    double Target[NUMPAT+1][NUMOUT+1] = { 
+        {0, 0},
+        {0, 0},
+        {0, 1},
+        {0, 1},
+        {0, 0} };
    
     double SumH[NUMPAT+1][NUMHID+1], WeightIH[NUMIN+1][NUMHID+1], Hidden[NUMPAT+1][NUMHID+1];
     double SumO[NUMPAT+1][NUMOUT+1], WeightHO[NUMHID+1][NUMOUT+1], Output[NUMPAT+1][NUMOUT+1];
@@ -40,12 +50,6 @@ int main()
     double DeltaWeightIH[NUMIN+1][NUMHID+1], DeltaWeightHO[NUMHID+1][NUMOUT+1];
     
     double Error, eta = 0.5, alpha = 0.9, smallwt = 0.5;
-
-    //eta is gradient descent contribution -> learning rate
-    //alpha maintain and smooth weight changes
-    //smallwt -> maximum abs size of initial weights
-
-    //deltaweight are a little shift to reduce the error when update weights
     
   	// initialize WeightIH randomly and DeltaWeightIH with zeros
     for(int j = 1; j <= NumHidden ; j++)
@@ -155,12 +159,12 @@ int main()
                 }
             }
         }
-        //print every 500 epoch
+        
         if( epoch%500 == 0 ) fprintf(stdout, "\nEpoch %-5d :   Error = %f", epoch, Error) ;
         if( Error < 0.0001 ) break ;  // stop learning when 'near enough'
     }
-
-    //some print to show evolution
+    
+    // print network outputs
     fprintf(stdout, "\n\nNETWORK DATA - EPOCH %d\n\nPat\t", epoch);   
     
     for(int i = 1; i <= NumInput; i++ )
@@ -187,7 +191,6 @@ int main()
             fprintf(stdout, "%f\t%f\t", Target[p][k], Output[p][k]);
         }
     }
-
-    printf("\n");
+    fprintf(stdout, "\n\nGoodbye!\n\n");
     return 1 ;
 }

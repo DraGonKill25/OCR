@@ -1,0 +1,12 @@
+Groupe : Obstacle Course Racing
+
+Membre du groupe:
+    Adam RILI
+    Leo DEVIN
+    Hugo RATTE
+    Mathis RABOUILLE
+
+Specification :
+    Our project for now do not have any link between each part of it. However
+each part have for now a Makefile. So you can type make in a terminal inside of
+each folder to test our project part.

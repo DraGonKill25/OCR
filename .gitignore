@@ -1,0 +1,14 @@
+*.a
+*.o
+*.so
+*~
+.*.swo
+*.swo
+.*.swp
+*.swp
+\#*\#
+obj
+.idea
+bin
+main
+a.out

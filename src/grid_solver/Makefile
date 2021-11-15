@@ -16,4 +16,4 @@ all: solver
 solver: ${OBJ}
 
 clean:
-	rm -f ${OBJ} ${DEP} solver
+	rm -f ${OBJ} ${DEP} *.result solver

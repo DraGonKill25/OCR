@@ -27,8 +27,12 @@ int Grid_Check(int grid[9][9],int row, int col, int num);
 //              file management tool
 //-----------------------------------------
 
-
+//simple function that will change the dot  of the file we read into 0 in the
+//grid or the int value of the caractere read
 int change_dot(char toto);
+
+//this function will first create a file with the expected name and then will
+//write the resolve grid into it
 void write_file(char *file_name, int grid[9][9]);
 
 //------------------------------------------------------------------
@@ -37,14 +41,16 @@ void write_file(char *file_name, int grid[9][9]);
 
 int Grid_Check(int grid[9][9], int row, int col, int num){
 
-    int rowStart = (row/3) * 3;
-    int colStart = (col/3) * 3;
+    int rowStart = (row/3) * 3;   //it will start a the upper left of the square
+    int colStart = (col/3) * 3;   //and at the right hight
     int i;
 
     for(i=0; i<9; ++i){
 
-        if (grid[row][i] == num) return 0;
-        if (grid[i][col] == num) return 0;
+        if (grid[row][i] == num) return 0;//check if the number exist in the col
+        if (grid[i][col] == num) return 0;//check if the number exist in the row
+
+        //regerde si le number is not in the square
         if (grid[rowStart + (i%3)][colStart + (i/3)] == num) return 0;
     }
     return 1;
@@ -52,19 +58,23 @@ int Grid_Check(int grid[9][9], int row, int col, int num){
 
 int Solve_Sudoku(int grid[9][9], int row, int col){
 
-    if(row<9 && col<9){
+    if(row<9 && col<9){//check if we are still in the grid
 
         if(grid[row][col]){
 
+            //ckeck if we can call the function on the next col
             if((col+1)<9) return Solve_Sudoku(grid, row, col+1);
+            //else check if we can call the function on the next raw
             else if((row+1)<9) return Solve_Sudoku(grid, row+1, 0);
+            //else all the grid are full and all the number are at a good
+            //position so we return true
             else return 1;
         }
         else{
 
-            for(int i=1; i<10; i++){
+            for(int i=1; i<10; i++){//value of the case
 
-                if(Grid_Check(grid, row, col, i)){
+                if(Grid_Check(grid, row, col, i)){//check each cell
 
                     grid[row][col] = i;
                     if((col+1)<9){
@@ -97,7 +107,7 @@ int change_dot(char toto){
 
     if(toto =='.')
         return 0;
-    return (int)(toto - '0');
+    return (int)(toto - '0');//give each int value of each char of the source file
 }
 
 void write_file(char *file_name, int grid[9][9]){
@@ -127,13 +137,17 @@ void write_file(char *file_name, int grid[9][9]){
 
 
     for (size_t i = 0; i < 9; i++){
+        //put each caractere at the good place and
+        //check when go to an other line
 
         for (size_t j = 0; j < 9; j++){
 
             fputc(48 + grid[i][j], file);
 
-            if ((j + 1) % 3 == 0 && (j != 8))
+            if ((j + 1) % 3 == 0 && (j != 8)){
                 fputc(32,file);
+                fputc(32,file);
+            }
         }
 
         if ((i + 1) % 3 == 0)
@@ -152,8 +166,8 @@ int main(int argc,  char *argv[]){
     if (argc>2||argc<2)
         errx(1,"The number of arguments is not valid");
 
-    char toto[9][9];
-    int good_one[9][9];
+    char toto[9][9];//create a temp array of the char in the origin file
+    int good_one[9][9];//array that will contain the grid
     int i=0,j=0,c;
 
     FILE *file = NULL;
@@ -161,7 +175,7 @@ int main(int argc,  char *argv[]){
     if(file == NULL)
         exit(1);
 
-    //IT WORKS PERFECTLY
+    //read the file and take each caractere in a grid at the good place
     while((c = (fgetc(file))) != EOF){
 
         if(i==9){
@@ -177,25 +191,20 @@ int main(int argc,  char *argv[]){
         }
     }
 
+    //put the char into int number
     for(int x=0; x<9; x++){
         for(int y=0; y<9; y++){
             good_one[x][y] = (change_dot(toto[x][y]));
         }
     }
 
-
+    //resolve the grid if posible else return an error
     if(Solve_Sudoku(good_one, 0, 0))
     {
-        /*printf("\n+-----+-----+-----+\n");
-        for(int h=0; h<9; h++)
-        {
-            for(int w=0; w<9; w++) printf("|%d", good_one[h][w]);
-            printf("|\n");
-            if ((h+1)%3 == 0) printf("+-----+-----+-----+\n");
-        }*/
+        //write into a new file the solve grid
         write_file(argv[1],good_one);
     }
-    else printf("\n\nNO SOLUTION\n\n");
+    else errx(1,"NO SOLUTION! The given grid is wrong please change it !");
 
     return 0;
 }
