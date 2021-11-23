@@ -3,6 +3,7 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_rotozoom.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <err.h>
 #include <math.h>
 
@@ -12,6 +13,7 @@ const double PI = 3.14159265358979323846;
 //Functions
 void colorTreatment(SDL_Surface *image);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
+
 
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
 {
@@ -109,7 +111,7 @@ Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
     Uint8 g;
     Uint8 b;
     SDL_GetRGB(Pixel, Format, &r, &g, &b);
-    if ((r + g + b) / 3 > 245)
+    if ((r + g + b) / 3 > 230)
     {
         return SDL_MapRGB(Format, 255, 255, 255);
     }
@@ -119,7 +121,65 @@ Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
     }
 }
 
+void insertionSort(Uint8 arr[], int n)
+{
+    int i, j;
+    Uint8 key;
+    for (i = 1; i < n; i++) {
+        key = arr[i];
+        j = i - 1;
+ 
+        /* Move elements of arr[0..i-1], that are
+          greater than key, to one position ahead
+          of their current position */
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+}
 
+Uint32 MedianValue(SDL_Surface *image, int x, int y)
+{
+    Uint32 pix[9];
+    Uint8 tab[9];
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+
+    pix[0] = get_pixel(image, x-1, y+1);
+    pix[1] = get_pixel(image, x, y+1);
+    pix[2] = get_pixel(image, x+1, y+1);
+    pix[3] = get_pixel(image, x-1, y);
+    pix[4] = get_pixel(image, x, y);
+    pix[5] = get_pixel(image, x+1, y);
+    pix[6] = get_pixel(image, x-1, y-1);
+    pix[7] = get_pixel(image, x, y-1);
+    pix[8] = get_pixel(image, x+1, y-1);
+
+    for (int i = 0; i < 9; i++)
+    {
+        SDL_GetRGB(pix[i], image->format, &r,&g,&b);
+        tab[i] = r;
+    }
+    
+    insertionSort(tab, 9);
+    int mid = 0;
+    for (int j = 2; j <= 6; j++)
+        mid += (int) tab[j];
+    mid = mid/5;
+    return SDL_MapRGB(image->format, tab[4],tab[4],tab[4]);
+    //return SDL_MapRGB(image->format, mid,mid,mid);
+}
+
+void MedianFilter(SDL_Surface* image){
+    for (int y = 1; y < image->h-1; y++)
+    {
+        for (int x = 1; x < image->w-1; x++)
+            put_pixel(image, x, y, MedianValue(image, x, y));
+    }
+}
 
 
 void Gamma(SDL_Surface* image_surface){
@@ -138,7 +198,6 @@ void Gamma(SDL_Surface* image_surface){
             put_pixel(image_surface, j, i, pixel);
         }
     }
-    SDL_SaveBMP(image_surface, "Gamma.bmp");
 }
 
 
@@ -180,9 +239,18 @@ void wait_for_keypressed()
     } while(event.type != SDL_KEYUP);
 }
 
+int str_bool(char* arg)
+{
+    if (arg[1] != '\0')
+        errx(2, "Not 1 or 0");
+    if (arg[0] == '0')
+        return 0;
+    return 1;
+}
+
 int main( int argc, char* args[] )
 {
-    if (argc!=2)
+    if (argc!=3)
     {
         errx(1, "The number of argument(s) is wrong! Please make sure that there is only one argument");
     }
@@ -231,13 +299,21 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
+                if (str_bool(args[2]))
+                {
+                    //Median filter                                                 
+                    MedianFilter(Loaded);
+                    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
+                    SDL_Flip(screenSurface);
+                    printf("Filter should have been done");
+                    wait_for_keypressed();
+                }
+
                 //Gamma
                 Gamma(Loaded);
-                Loaded = IMG_Load("Gamma.bmp");
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
-
 
                 //Black and White
                 colorTreatment(Loaded);
@@ -246,6 +322,15 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
+                if (str_bool(args[2]))
+                {
+                    //Median filter
+                    MedianFilter(Loaded);
+                    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
+                    SDL_Flip(screenSurface);
+                    printf("Filter should have been done");
+                    wait_for_keypressed();   
+                }
 
                 //Rotation and update
                 Loaded = rotozoomSurface(screenSurface, -90, 1, 1);
