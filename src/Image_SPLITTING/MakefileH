@@ -1,11 +1,11 @@
 CC=gcc
 CPPFLAGS=
-CFLAGS=-Wall -Wextra -Werror -std=c99 $$(pkg-config --cflags sdl)
-LDFLAGS=
-LDLIBS=-lm $$(pkg-config --libs sdl SDL_image)
+CFLAGS=-Wall -Wextra -Werror -std=c99
+LDFLAGS= -fsanitize=address
+LDLIBS= -lSDL2 -lSDL2_image -lm `sdl2-config --cflags --libs`
 EXEC= main
 
-SRC= Image_Splitting.c
+SRC= hough.c
 OBJ= ${SRC:.c=.o}
 DEP= ${SRC:.c=.d}
 
