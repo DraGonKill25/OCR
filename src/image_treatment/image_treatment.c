@@ -11,8 +11,8 @@
 const double PI = 3.14159265358979323846;
 
 //Functions
-void colorTreatment(SDL_Surface *image);
-Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format);
+void colorTreatment(SDL_Surface *image, int value);
+Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format, int value);
 
 
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
@@ -87,7 +87,7 @@ void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
 
 // Simple function applying a treatment to every pixel in an image
 // in this case it is a Blackscale treatment and directly modify the image
-void colorTreatment(SDL_Surface *image)
+void colorTreatment(SDL_Surface *image, int value)
 {
     int i, j;
     SDL_LockSurface(image);
@@ -98,20 +98,20 @@ void colorTreatment(SDL_Surface *image)
     {
         for(j = 0; j < w; j++)
         {
-            put_pixel(image,j,i,blackAndwhite(get_pixel(image,j,i), Format));
+            put_pixel(image,j,i,blackAndwhite(get_pixel(image,j,i), Format, value));
         }
     }
     SDL_UnlockSurface(image);
 }
 
 // Blackscale function
-Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
+Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format, int value)
 {
     Uint8 r;
     Uint8 g;
     Uint8 b;
     SDL_GetRGB(Pixel, Format, &r, &g, &b);
-    if ((r + g + b) / 3 > 230)
+    if ((r + g + b) / 3 > value)
     {
         return SDL_MapRGB(Format, 255, 255, 255);
     }
@@ -250,11 +250,20 @@ int str_bool(char* arg)
 
 int main( int argc, char* args[] )
 {
-    if (argc!=3)
+    if (argc!=4)
     {
-        errx(1, "The number of argument(s) is wrong! Please make sure that there is only one argument");
+        errx(1, "The number of argument(s) is wrong! Please make sure that there is only one argument\n");
     }
 
+    int value=0;
+    char *p=args[3];
+
+    while(*p!='\0'){
+        value*=10;
+        value+=(int)(*p-'0');
+        p++;
+    }
+    printf("%d", value);
 
     //The surface displayed on the window
     SDL_Surface * screenSurface = NULL;
@@ -316,7 +325,7 @@ int main( int argc, char* args[] )
                 wait_for_keypressed();
 
                 //Black and White
-                colorTreatment(Loaded);
+                colorTreatment(Loaded, value);
                 SDL_SaveBMP(Loaded, "BlackAndWhite.bmp");
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
@@ -328,7 +337,7 @@ int main( int argc, char* args[] )
                     MedianFilter(Loaded);
                     SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                     SDL_Flip(screenSurface);
-                    printf("Filter should have been done");
+                    printf("Filter should have been done\n");
                     wait_for_keypressed();   
                 }
 
