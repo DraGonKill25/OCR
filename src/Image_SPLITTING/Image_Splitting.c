@@ -157,7 +157,7 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
     Uint8 g;
     Uint8 b;
     SDL_GetRGB(Pixel,Format,&r, &g, &b);
-    if ((r + g + b) / 3 == 255 )
+    if ((r + g + b) / 3 > 240 )
         return 1;
     return 0;
 
@@ -176,8 +176,8 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 int research_L(SDL_Surface *image, int x,int y,int h)
 {
     SDL_PixelFormat *Format = image->format;
-    int y1 = y+1;
-    int x1 = x+ 1;
+    int y1 = y+6;
+    int x1 = x+ 6;
     while ( y1 < h && BlackorWhite(get_pixel(image,x1,y1),Format) == 1 ) // search the lenght of a small square
     {
         y1++;
@@ -207,19 +207,28 @@ int Good_research(SDL_Surface *image,int x,int y){
     }
     else
     {
-            if(BlackorWhite(get_pixel(image,x+1,y),Format) == 1) // check the right pixel
+            if(BlackorWhite(get_pixel(image,x+10,y),Format) == 1) // check the right pixel
                 return 0;
-            if (BlackorWhite(get_pixel(image,x,y+1),Format) == 1) // check the down pixel of y
+            if (BlackorWhite(get_pixel(image,x,y+10),Format) == 1) // check the down pixel of y
                 return 0;
-            if (BlackorWhite(get_pixel(image,x+1,y+1),Format) == 1) // check if the right pixel of the down pixel is white
+            if (BlackorWhite(get_pixel(image,x+7,y+7),Format) == 1) // check if the right pixel of the down pixel is white
             {
-                int y1 = y+1;
-                int x1 = x+ 1;
+                int y1 = y+10;
+                int x1 = x+ 10;
                 while ( y1 < h && BlackorWhite(get_pixel(image,x1,y1),Format) == 1 ) // search the lenght of a small square
                 {
                     y1++;
                 }
                 int l = y1 - y;
+                y1 = y1 + 10;
+                while ( x1 < w && BlackorWhite(get_pixel(image,x1,y1),Format) == 1 ) // search the lenght of a small square
+                {
+                    x1++;
+                }
+                if(l -  (x1 - x) > 6 || l - (x1 - x) < -6)
+                    return 0;
+
+
                 int newx = x + 1;
                 int oldx = x;
                 int oldl = l;
@@ -402,9 +411,10 @@ int main(int argc, char* argv[])
     printf("x=%d and y=%d\n",x,y);
     
     //search_grille(image_surface);
-
-    // save_cells(image_surface);
-    //wait_for_keypressed();
+    
+    image_surface = Zoom(image_surface, x,x + l*9, l, y,y + l*9);
+    save_cells(image_surface);
+    wait_for_keypressed();
     SDL_FreeSurface(image_surface);
 
 
