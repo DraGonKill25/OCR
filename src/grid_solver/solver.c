@@ -1,3 +1,6 @@
+#include "solver.h"
+
+
 //all the function in this file are going to be use for solve the sudoku
 //however the main will be in an other file name main.c
 //i will add a Makefile excpecialy for this part later

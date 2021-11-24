@@ -6,6 +6,7 @@
 #include <err.h>
 #include <string.h>
 
+
 //-------------------------------------------
 //           solver relative tool
 //------------------------------------------
@@ -29,3 +30,6 @@ int change_dot(char toto);
 //this function will first create a file with the expected name and then will
 //write the resolve grid into it
 void write_file(char *file_name, int grid[9][9]);
+
+
+#endif

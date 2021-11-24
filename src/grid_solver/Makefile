@@ -5,7 +5,7 @@ LDFLAGS=
 LDLIBS=
 EXEC=
 
-SRC= solver.c
+SRC= main.c
 OBJ= ${SRC:.c=.o}
 DEP= ${SRC:.c=.d}
 
@@ -16,4 +16,5 @@ all: solver
 solver: ${OBJ}
 
 clean:
-	rm -f ${OBJ} ${DEP} *.result solver
+	rm -f *.d *.o *.result solver
+
