@@ -1,5 +1,9 @@
 #include "image_treatment.h"
 
+
+int s[5] = {245,238,245,230,247};
+int f[5] = {1,0,0,1,0};
+
 int str_bool(char* arg)
 {
     if (arg[1] != '\0')
@@ -12,18 +16,9 @@ int str_bool(char* arg)
 
 int main( int argc, char* args[] )
 {
-    if (argc!=4)
+    if (argc!=2)
     {
         errx(1, "The number of argument(s) is wrong! Please make sure that there is only one argument\n");
-    }
-
-    int value=0;
-    char *p=args[3];
-
-    while(*p!='\0'){
-        value*=10;
-        value+=(int)(*p-'0');
-        p++;
     }
 
     //The surface displayed on the window
@@ -41,6 +36,8 @@ int main( int argc, char* args[] )
     {
         //Load image using SDL_image
         Loaded=IMG_Load(args[1]);
+        int val =(int)(args[1][17]-'0');
+        printf("%d", val);
         if(!Loaded) 
         {
             printf("IMG_Load: %s\n", IMG_GetError());
@@ -69,7 +66,7 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
-                if (str_bool(args[2]))
+                if (f[val-1])
                 {
                     //Median filter
                     MedianFilter(Loaded);
@@ -85,13 +82,13 @@ int main( int argc, char* args[] )
                 wait_for_keypressed();
 
                 //Black and White
-                colorTreatment(Loaded, value);
+                colorTreatment(Loaded, s[val-1]);
                 SDL_SaveBMP(Loaded, "BlackAndWhite.bmp");
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
-                if (str_bool(args[2]))
+                if (f[val-1])
                 {
                     //Median filter
                     MedianFilter(Loaded);
