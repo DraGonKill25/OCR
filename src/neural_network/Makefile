@@ -5,15 +5,15 @@ LDFLAGS=
 LDLIBS=-lm 
 EXEC=
 
-SRC= xor.c
+SRC= main.c
 OBJ= ${SRC:.c=.o}
 DEP= ${SRC:.c=.d}
 
-all: xor
+all: main
 
 -include ${DEP}
 
 xor: ${OBJ}
 
 clean:
-	rm -f ${OBJ} ${DEP} xor
+	rm -f ${OBJ} ${DEP} xor neural_network

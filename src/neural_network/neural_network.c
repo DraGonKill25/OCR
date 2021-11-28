@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
+#include "neural_network_tools.h"
 
 
 struct Neural_Network
@@ -12,24 +13,24 @@ struct Neural_Network
 
     //Arrays
     double OutputI[28*28];
-    double Goal[52];
+    double Goal[11];
     //Weight Arrays
     double WeightIH[28*28][20];
-    double WeightHO[20][52];
+    double WeightHO[20][11];
     //Bias Array
     double BiasH[20];
     //Bias output
-    double BiasO[52];
+    double BiasO[11];
     //Output Hidden
     double OutputH[20];
     //Output of output
-    double OutputO[52];
+    double OutputO[11];
 
     //delta weight
     double dWeightIH[28*28][20];
-    double dWeightHO[20][52];
+    double dWeightHO[20][11];
     //delta of output
-    double dOutputO[52];
+    double dOutputO[11];
     //delta of hidden
     double dHidden[20];
 
@@ -40,19 +41,6 @@ struct Neural_Network
 
     char *str;
 };
-
-
-#define Random() ((double) rand()/((double) RAND_MAX + 1))
-
-double Sigmoid(double x)
-{
-    return (1.0 / (1.0 + exp(-x)));
-}
-
-double Derivate_Sigmoid(double x)
-{
-    return x * (1.0 - x);
-}
 
 
 struct Neural_Network* InitializeNetwork()
@@ -232,7 +220,7 @@ static void UpdateBiases(struct Neural_Network *net)
 void Neural_Network_OCR(struct Neural_Network *net, double *input, double *goal)
 {
   //Initialise Goals & InputValues for this char
-  for (int g = 0; g < 52; g++)
+  for (int g = 0; g < 11; g++)
   {
     net -> Goal[g] = goal[g];
   }
@@ -249,20 +237,3 @@ void Neural_Network_OCR(struct Neural_Network *net, double *input, double *goal)
   UpdateBiases(net);
 }
 
-
-int main(int argc, char** argv)
-{
-    if (argc <= 3)
-    {
-        errx(1, "ta race ta pas mis le bon nombre de paramettre (il en faut 3)");
-    }
-
-    double *input = argv[1];
-    double *goal = argv[2];
-
-    Neural_Network* nn = InitializeNetwork();
-    Neural_Network_OCR(nn, input, goal);
-
-
-    return 0;
-}
