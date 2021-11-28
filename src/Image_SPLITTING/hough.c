@@ -105,162 +105,162 @@ void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
 }
 
 
-
-
-void drawLine(SDL_Surface *image, int x0, int y0, int x1, int y1, Uint32 pixel)
+double Convolution(SDL_Surface *image, int kernel[3][3], int row, int col)
 {
-    int w = image->w;
-    int h = image->h;
-    int dx = abs(x1 - x0);
-    int sx = x0 < x1 ? 1 : -1;
-    int dy = -abs(y1 - y0);
-    int sy = y0 < y1 ? 1 : -1;
-
-    int err = dx + dy;
-
-    while (1)
-    {
-        
-        if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
-        {
-            put_pixel(image,x0,y0,pixel);
-        }
-
-        if (x0 == x1 && y0 == y1)
-            break;
-
-        int e2 = 2 * err;
-
-        if (e2 >= dy)
-        {
-            err += dy;
-            x0 += sx;
-        }
-        if (e2 <= dx)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-}
-
-
-void Hough(SDL_Surface *image)
-{
-    double width = image->w;
-    double height = image->h;
-    double count = 200;
-
-    double rho,theta;
-
-    double d = sqrt(width * width + height * height);
-
-    double num_rhos = 2 * d + 1;
-    double num_thetas = num_rhos;
-    double dtheta = 180 / num_thetas;
-    double drhos = num_rhos / 180;
-
-    int i;
-    double *thetas = malloc(sizeof(double)*num_thetas+1);
-    double *rhos = malloc(sizeof(double)*num_rhos+1);
-
-    for (i = 0; i <= num_thetas; i++) thetas[i] = i*dtheta;
-    for (i = 0; i <= num_rhos; i++) {rhos[i] = i*drhos-d; printf("%lf\n",rhos[i]);}
-
-    double *cos_thetas = malloc(sizeof(double) * (num_thetas + 1));
-    double *sin_thetas = malloc(sizeof(double) * (num_thetas + 1));
-    for (int i = 0; i <= num_thetas; i++)
-    {
-        thetas[i] = degToRad(thetas[i]);
-        cos_thetas[i] = cos(thetas[i]);
-        sin_thetas[i] = sin(thetas[i]);
-    }
-
-    int **accu = malloc(sizeof(int*)*num_rhos);
-    for (i = 0; i < num_rhos; i++) 
-    {
-        accu[i] = malloc(sizeof(int)*num_thetas);
-        for (int j = 0; j < num_thetas; j++)
-        {
-            accu[i][j] = 0;
-        }
-    }
+    double sum = 0;
 
     Uint32 pixel;
     Uint8 r, g, b;
-    int x,y;
+    double px_value;
 
-    for (x = 0; x < width; x++)
+    for (int i = 0; i < 3; i++)
     {
-        for (y = 0; y < height; y++)
+        for (int j = 0; j < 3; j++)
         {
-            pixel = get_pixel(image, x, y);
-            r = pixel >> 16 & 0xFF;
-            g = pixel >> 8 & 0xFF;
-            b = pixel & 0xFF;
-            int pixel_value = (r+g+b)/3;
-                  
-            if (pixel_value == 255)
+            pixel = get_pixel(image, j + col, i + row);
+            SDL_GetRGB(pixel, image -> format, &r, &g, &b);
+
+            if (r == 0 && g == 0 && b == 0)
+                px_value = 1;
+            else
+                px_value = 0;
+
+            sum += px_value * kernel[i][j];
+        }
+
+    }
+
+    return sum;
+}
+
+void SobelEdgeDetection(SDL_Surface *in, SDL_Surface *out, double threshold)
+{
+    double gx, gy;
+
+    double g_px;
+    //double theta;
+    Uint32 pixel;
+    //Uint8 r, g, b;
+
+    int kernel_x[3][3] = {
+        {-1, 0, 1},
+        {-2, 0, 2},
+        {-1, 0, 1}};
+
+    int kernel_y[3][3] = {
+        {1, 2, 1},
+        {0, 0, 0},
+        {-1, -2, -1}};
+
+
+    for (int i = 1; i < in -> h - 2; i++)
+    {
+        for (int j = 1; j < in -> w - 2; j++)
+        {
+            gx = Convolution(in, kernel_x, i, j);
+            gy = Convolution(in, kernel_y, i, j);
+
+            g_px = sqrt(gx * gx + gy * gy);
+
+
+            if ((g_px > threshold))
             {
-                for (int t = 0; t < num_thetas; t++)
+                pixel = SDL_MapRGB(in -> format, 255, 255, 255);
+                put_pixel(out, j, i, pixel);
+            }
+            else
+            {
+                pixel = SDL_MapRGB(in -> format, 0, 0, 0);
+                put_pixel(out, j, i, pixel);
+            }
+        }
+    }
+
+    SDL_SaveBMP(out, "sobel.bmp");
+}
+
+
+void DrawLine_v3(SDL_Surface *img, int x0, int y0, int x1, int y1, float wd, Uint32 pixel_color)
+{
+    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx - dy, e2, x2, y2;
+    float ed = dx + dy == 0 ? 1 : sqrt((float) dx * dx + (float) dy * dy);
+
+
+    Uint32 pixel = pixel_color;
+
+    for (wd = (wd + 1) / 2 ; ; )
+    {
+        if (x0 >= 0 && y0 >= 0 && x0 < img -> h && y0 < img -> w)
+        {
+            put_pixel(img, y0, x0, pixel);
+        }
+
+        e2 = err;
+        x2 = x0;
+
+        if (2 * e2 >= -dx)
+        {
+            for (e2 += dy, y2 = y0; e2 < ed * wd && (y1 != y2 || dx > dy); e2 += dx)
+            {
+                if (x0 >= 0 && x0 < img -> h && (y2 + sy) >= 0 && (y2 + sy) < img -> w)
                 {
-                    rho = (x * cos_thetas[t]) + (y * sin_thetas[t]);
-                    int p = rho + d;
-                    accu[p][t]++;
+                    put_pixel(img, (y2 += sy), x0, pixel);
                 }
             }
-        }
-    }
 
-    pixel = SDL_MapRGB(image->format,0,0,255);
-
-    drawLine(image,-600,0,-933,1000,pixel);
-
-    int prev = accu[0][0];
-    int t = 0, rr = 0;
-    int inc = 1;
-
-    for (y = 0; y < num_rhos; y++)
-    {
-        for (x = 0; x < num_rhos; x++)
-        {
-            int val = accu[y][x];
-            if (val >= prev)
+            if (x0 == x1)
             {
-                prev = val;
-                r = y;
-                t = x;
-                inc = 1;
-                continue;
+                break;
             }
-            else if (val < prev && inc)
-                inc = 0;
-            if (val < count)
-                continue;
-            
-            rho = rhos[rr];
-            theta = thetas[t];
-            double a = cos(theta);
-            double b = sin(theta);
-            int x0 = a * rho;
-            int y0 = b * rho;
-            int x1 = x0 + d * (-b);
-            int y1 = y0 + d * (a);
-            int x2 = x0 - d * (-b);
-            int y2 = y0 - d * (a);
-            drawLine(image,x1,y1,x2,y2,pixel);
+
+            e2 = err;
+            err -= dy;
+            x0 += sx;
+        }
+
+        if (2 * e2 <= dy)
+        {
+            for (e2 = dx - e2; e2 < ed * wd && (x1 != x2 || dx < dy); e2 += dy)
+            {
+                if ((x2 + sx >= 0 && x2 + sx < img -> h) && (y0 >= 0 && y0 < img -> w))
+                {
+                    put_pixel(img, y0, x2 += sx, pixel);
+                }
+            }
+
+            if (y0 == y1)
+            {
+                break;
+            }
+
+            err += dx;
+            y0 += sy;
+        }
+
+
+    }
+}
+
+void Flip(SDL_Surface *img)
+{
+    SDL_Surface *flipped = SDL_CreateRGBSurface(0, img -> h, img -> w, 32, 0, 0, 0, 0);
+
+    Uint32 pixel;
+
+    for (int i = 0; i < img -> h; i++)
+    {
+        for (int j = 0; j < img -> w; j++)
+        {
+            pixel = get_pixel(img, j, i);
+            put_pixel(flipped, i, j, pixel);
         }
     }
 
-    for (y = 0; y < num_rhos; y++)
-    {
-        free(accu[y]);
-    }
-    free(accu);
-    free(rhos);
-    free(thetas);
-    free(cos_thetas);
-    free(sin_thetas);
+    *img = *flipped;
+
+    free(flipped);
 }
 
 double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, int num_thetas, int num_rhos, int threshold, char *line_color)
@@ -273,7 +273,7 @@ double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, i
     int d = (int) (sqrt((edge_image -> h) * (edge_image -> h) + (edge_image -> w) * (edge_image -> w)));
 
     double d_theta =  181 / num_thetas;
-//    double d_rho = (int) (2 * d + 1) / num_rhos;
+//  double d_rho = (int) (2 * d + 1) / num_rhos;
 
     double thetas[181];
     double sin_thetas[181];
@@ -304,13 +304,9 @@ double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, i
     int accumulator[2 * d + 1][181];
 
     for (int i = 0; i < 2 * d + 1; i++)
-    {
         for (int j = 0; j < 181; j++)
-        {
             accumulator[i][j] = 0;
-        }
-    }
-
+    
 
     // begin hough
 
@@ -322,8 +318,8 @@ double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, i
 
     int half_w = edge_image -> w / 2;
     int half_h = edge_image -> h / 2;
-    int rho_index = 0;
 
+    int rho_index = 0;
 
     for (int y = 0; y < edge_image -> h; y++)
     {
@@ -367,6 +363,7 @@ double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, i
     double max_peak_theta = 0;
 
 
+
     printf("%s", line_color);
 
 
@@ -389,17 +386,15 @@ double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, i
     }
 
     printf("Angle : %f", max_peak_theta);
-
-    if (max_peak_theta > 90 && max_peak_theta < 135)
+   
+    if (max_peak_theta > 90 && max_peak_theta < 135){
+        return max_peak_theta + 180 + 360;}
+       
+    if (max_peak_theta > 135){
         return max_peak_theta + 180 + 360;
-
-    if (max_peak_theta > 135)
-        return max_peak_theta + 180 + 360 ;
-
-    return max_peak_theta + 360;
+    }
+    return max_peak_theta-90+360; //- 90 + 360;
 }
-
-
 
 
 int crop_vertical_blob(SDL_Surface* img, int *border_1, int *border_2)
@@ -433,7 +428,7 @@ int crop_vertical_blob(SDL_Surface* img, int *border_1, int *border_2)
             {
                 put_pixel(copy, j, a, pixel);
                 a += 1;
-            }           
+            }          
         }
 
         nb_inter = 0;
@@ -462,7 +457,7 @@ int crop_vertical_blob(SDL_Surface* img, int *border_1, int *border_2)
     {
         pixel = get_pixel(copy, j, i);
         SDL_GetRGB(pixel, copy -> format, &r, &g, &b);
-        
+       
         while (r == 0 && g == 0 && b == 0 && (j < (img -> w)))
         {
             pixel = get_pixel(copy, j, i);
@@ -483,7 +478,7 @@ int crop_vertical_blob(SDL_Surface* img, int *border_1, int *border_2)
 
             border2 = j;
         }
-        
+       
         if (border2 - border1 > max)
         {
             max_border1 = border1;
@@ -674,7 +669,7 @@ void DetectBiggestBlob(SDL_Surface *image_surface, int *pos_x, int *pos_y)
         *pos_x += b7;
     }
 
-    SDL_SaveBMP(image_surface, "processing_steps/blob.bmp");
+    SDL_SaveBMP(image_surface, "blob.bmp");
 }
 
 
@@ -688,30 +683,34 @@ void DetectBiggestBlob(SDL_Surface *image_surface, int *pos_x, int *pos_y)
 
 int main(int argc, char* argv[])
 {
-        if (argc != 2)
-        {
-            errx(1, "Number of argument exceed or is less than 2");
-        }
+    if (argc != 2)
+    {
+        errx(1, "Number of argument exceed or is less than 2");
+    }
 
-        SDL_Surface *screenSurface = NULL;
+    //SDL_Surface *screenSurface = NULL;
 
-        SDL_Surface* image_surface;
-        init_sdl();
+    init_sdl();
+    SDL_Surface* image_de_base;
+    image_de_base = load_image(argv[1]);
 
-        image_surface = load_image(argv[1]);
+    //load image_surface
+    //create int x,y;
+    //appelle fonction avec &x et &y
+    SDL_Surface *sobel_surface= SDL_CreateRGBSurface(0,image_de_base->w, image_de_base->h, 32, 0,0,0,0);
+    SobelEdgeDetection(image_de_base, sobel_surface, 0.02);
+    //Hough(houg_surface, image_surface, 180, 180, 3, "blue");
+    SDL_Surface *final_surface= SDL_CreateRGBSurface(0,houg_surface->w, houg_surface->h, 32, 0,0,0,0);
+    double angle = HoughTransformAngleDetection(sobel_surface, image_de_base, 180, 180, 3, "blue");
+    printf("\n%f\n", angle);
+    /*int pos_x=0;
+    int pos_y=0;
+    DetectBiggestBlob(image_de_base, &pos_x, &pos_y);
+    printf("%d|%d\n", pos_x, pos_y);*/
 
-        Hough(image_surface);
-        SDL_Surface *houg_surface= SDL_CreateRGBSurface(0,image_surface->w, image_surface->h, 32, 0,0,0,0);
-        double angle = HoughTransformAngleDetection(houg_surface, image_surface, 180, 180, 3, "blue");
-        printf("%f", angle);
-        int pos_x=0;
-        int pos_y=0;
-        printf("test");
-        DetectBiggestBlob(image_surface, &pos_x, &pos_y);
-        printf("%d|%d", pos_x, pos_y);
+    //SDL_BlitSurface(image_surface,NULL,screenSurface,NULL);
+    SDL_FreeSurface(image_de_base);
+    SDL_FreeSurface(sobel_surface);
 
-        SDL_BlitSurface(image_surface,NULL,screenSurface,NULL);
-        SDL_FreeSurface(image_surface);
-
-        return 0;
+    return 0;
 }
