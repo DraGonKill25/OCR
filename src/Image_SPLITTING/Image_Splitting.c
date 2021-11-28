@@ -173,7 +173,7 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 
 
 
-int research_L(SDL_Surface *image, int x,int y,int h)
+double research_L(SDL_Surface *image, int x,int y,int h)
 {
     SDL_PixelFormat *Format = image->format;
     int y1 = y+6;
@@ -182,7 +182,7 @@ int research_L(SDL_Surface *image, int x,int y,int h)
     {
         y1++;
     }
-    int l = y1 - y;
+    double l = y1 - y;
     return l;
 
     
@@ -275,7 +275,7 @@ SDL_Surface* ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
 {
     Uint8 r,g,b;
     Uint32 pixel;
-    SDL_Surface* result = SDL_CreateRGBSurface(0,abs(x2-l),abs(y1-y2),32,0,0,0,0);
+    SDL_Surface* result = SDL_CreateRGBSurface(0,28,28,32,0,0,0,0);
     for(int y = 0; y < abs(y1-y2); y++)
     {
         for(int x = 0; x < abs(x2-l); x++)
@@ -406,8 +406,8 @@ int main(int argc, char* argv[])
         }
         x++;
     }
-    int l = research_L(image_surface,x,y,height);
-    printf("%d + %d\n",res,l);
+    double l = research_L(image_surface,x,y,height);
+    printf("%d + %f\n",res,l);
     printf("x=%d and y=%d\n",x,y);
     
     //search_grille(image_surface);
