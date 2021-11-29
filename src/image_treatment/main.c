@@ -1,8 +1,7 @@
 #include "image_treatment.h"
 
 
-int s[5] = {245,238,245,230,247};
-int f[5] = {1,0,0,1,0};
+//int s[5] = {245,238,245,230,247};
 
 int str_bool(char* arg)
 {
@@ -26,6 +25,10 @@ int main( int argc, char* args[] )
 
     //The surface of the image we are gonna load
     SDL_Surface * Loaded = NULL;
+
+    //The surface for sobel
+    SDL_Surface *sobel_surface=NULL;
+
 
     //Initialize SDL video module
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -58,6 +61,7 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
+
                 //Treat the loaded image
                 //
                 //Grayscale
@@ -66,14 +70,11 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
-                if (f[val-1])
-                {
-                    //Median filter
-                    MedianFilter(Loaded);
-                    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
-                    SDL_Flip(screenSurface);
-                    wait_for_keypressed();
-                }
+                //Median filter
+                MedianFilter(Loaded);
+                SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();
 
                 //Gamma
                 Gamma(Loaded);
@@ -82,27 +83,36 @@ int main( int argc, char* args[] )
                 wait_for_keypressed();
 
                 //Black and White
-                colorTreatment(Loaded, s[val-1]);
+                colorTreatment(Loaded, 247);
                 SDL_SaveBMP(Loaded, "BlackAndWhite.bmp");
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
-                if (f[val-1])
-                {
-                    //Median filter
-                    MedianFilter(Loaded);
-                    SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
-                    SDL_Flip(screenSurface);
-                    wait_for_keypressed();   
-                }
+                //Sobel
+                sobel_surface= SDL_CreateRGBSurface(0,Loaded->w, Loaded->h, 32, 0,0,0,0);
+                SobelEdgeDetection(Loaded, sobel_surface, 0.02);
+                SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();
+                
+                double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
+
+
+                //Median filter
+                MedianFilter(sobel_surface);
+                SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();   
+                
 
                 //Rotation and update
-                Loaded = rotozoomSurface(screenSurface, -90, 1, 1);
-                screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32,SDL_SWSURFACE);
-                SDL_BlitSurface(Loaded,NULL,screenSurface,NULL);
+                sobel_surface = rotozoomSurface(screenSurface, angle, 1, 1);
+                screenSurface = SDL_SetVideoMode( sobel_surface->w, sobel_surface->h, 32,SDL_SWSURFACE);
+                SDL_BlitSurface(sobel_surface,NULL,screenSurface,NULL);
                 SDL_Flip(screenSurface);
 
+                SDL_SaveBMP(sobel_surface, "test.bmp");
                 //Wait for a key to be pressed to end the program
                 wait_for_keypressed();
             }
@@ -110,6 +120,7 @@ int main( int argc, char* args[] )
     }
     SDL_FreeSurface( screenSurface );
     SDL_FreeSurface( Loaded );
+    SDL_FreeSurface( sobel_surface );
 
     //Quit SDL subsystems
     SDL_Quit();

@@ -699,8 +699,7 @@ int main(int argc, char* argv[])
     //appelle fonction avec &x et &y
     SDL_Surface *sobel_surface= SDL_CreateRGBSurface(0,image_de_base->w, image_de_base->h, 32, 0,0,0,0);
     SobelEdgeDetection(image_de_base, sobel_surface, 0.02);
-    //Hough(houg_surface, image_surface, 180, 180, 3, "blue");
-    SDL_Surface *final_surface= SDL_CreateRGBSurface(0,houg_surface->w, houg_surface->h, 32, 0,0,0,0);
+    //SDL_Surface *final_surface= SDL_CreateRGBSurface(0,houg_surface->w, houg_surface->h, 32, 0,0,0,0);
     double angle = HoughTransformAngleDetection(sobel_surface, image_de_base, 180, 180, 3, "blue");
     printf("\n%f\n", angle);
     /*int pos_x=0;

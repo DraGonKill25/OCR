@@ -1,0 +1,23 @@
+CC=gcc
+CPPFLAGS=
+CFLAGS=-Wall -Wextra -Werror -std=c99
+LDFLAGS=
+LDLIBS= -lSDL2 -lSDL2_image -lm `sdl2-config --cflags --libs`
+EXEC= main
+
+SRC= hough.c
+OBJ= ${SRC:.c=.o}
+DEP= ${SRC:.c=.d}
+
+all: ${EXEC}
+
+
+
+${EXEC}: ${OBJ}
+
+	${CC} ${LDLIBS} ${LDFLAGS} -o $@ $^ 
+
+
+
+clean:
+	rm -f ${OBJ} ${DEP} ${EXEC} main

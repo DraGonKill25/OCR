@@ -21,6 +21,12 @@ void MedianFilter(SDL_Surface* image);
 void Gamma(SDL_Surface* image_surface);
 Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format, int value);
 void colorTreatment(SDL_Surface *image, int value);
+double Convolution(SDL_Surface *image, int kernel[3][3], int row, int col);
+void SobelEdgeDetection(SDL_Surface *in, SDL_Surface *out, double threshold);
+void DrawLine_v3(SDL_Surface *img, int x0, int y0, int x1, int y1, float wd, Uint32 pixel_color);
+void Flip(SDL_Surface *img);
+double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, int num_thetas, int num_rhos, int threshold);//, char *line_color);
+
 
 
 

@@ -158,8 +158,8 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
     Uint8 b;
     SDL_GetRGB(Pixel,Format,&r, &g, &b);
     if ((r + g + b) / 3 > 240 )
-        return 1;
-    return 0;
+        return 0;
+    return 1;
 
 }
 
