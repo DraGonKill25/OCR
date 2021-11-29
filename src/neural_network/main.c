@@ -5,18 +5,24 @@
 #include <stdlib.h>
 #include "neural_network_XOR.h"
 
-int main(int argc, char** argv)
+int main()
 {
-    if (argc <= 3)
-    {
-        errx(1, "Invalid argument(s)");
-    }
+    struct Neural_Network* nn = InitializeNetwork();
 
-    double *input = argv[1];
-    double *goal = argv[2];
 
-    Neural_Network* nn = InitializeNetwork();
+    //trainning
     Neural_Network_OCR(nn, input, goal);
+
+
+    //tableau save
+    char input; 
+    char goal;
+
+    //appeler forward
+    //recup les weights
+    //appliquer softmax
+    //ecrire dans le fichier
+
 
 
     return 0;

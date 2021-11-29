@@ -52,6 +52,6 @@ struct Neural_Network* InitializeNetwork();
 
 void PrintState(struct Neural_Network *net);
 
-void Neural_Network_OCR(Neural_Network *net, double *input,double *goal);
+void Neural_Network_OCR(struct Neural_Network *net, double *input,double *goal);
 
 # endif
