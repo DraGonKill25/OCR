@@ -1,5 +1,61 @@
 #include "neural_network_tools.h"
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "SDL/SDL.h"
+#include "SDL/SDL_image.h"
+#include <err.h>
+
+void init_sdl()
+{
+    // Init only the video part.
+    // If it fails, die with an error message.
+    if(SDL_Init(SDL_INIT_VIDEO) == -1)
+        errx(1,"Could not initialize SDL: %s.\n", SDL_GetError());
+}
+
+SDL_Surface* load_image(char *path)
+{
+    SDL_Surface *img;
+
+    // Load an image using SDL_image with format detection.
+    // If it fails, die with an error message.
+    img = IMG_Load(path);
+    if (!img)
+        errx(3, "can't load %s: %s", path, IMG_GetError());
+
+    return img;
+}
+
+SDL_Surface* display_image(SDL_Surface *img)
+{
+    SDL_Surface *screen;
+
+    // Set the window to the same size as the image
+    screen = SDL_SetVideoMode(img->w, img->h, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+    if (screen == NULL)
+    {
+        // error management
+        errx(1, "Couldn't set %dx%d video mode: %s\n",
+                img->w, img->h, SDL_GetError());
+    }
+
+    // Blit onto the screen surface
+    if(SDL_BlitSurface(img, NULL, screen, NULL) < 0)
+        warnx("BlitSurface error: %s\n", SDL_GetError());
+
+    // Update the screen
+    SDL_UpdateRect(screen, 0, 0, img->w, img->h);
+
+    // return the screen for further uses
+    return screen;
+}
+
+
+void wait_for_keypressed()
+{
+    SDL_Event event;
+
 //A random that returns a double in [-1; 1]
 double Random()
 {
@@ -17,6 +73,36 @@ double Derivate_Sigmoid(double x)
 {
   return x * (1.0 - x);
 }
+
+
+void image_to_list(SDL_Surface* image_surface, int* input)
+{
+    SDL_Surface* image = image_surface;
+
+    size_t w = image->w;
+    size_t h = image->h;
+
+    for (size_t i = 0; i < w; i++)
+    {
+        for (size_t j = 0; j < h; j++)
+        {
+            Uint32 pixel = get_pixel(image, i, j);
+            Uint8 r, g, b;
+            SDL_GetRGB(pixel, image->format, &r, &g, &b);
+            if (r == 255)
+            {
+                input[j * w + i] = 1;
+            }
+            else
+            {
+                input[j * w + i] = 0;
+            }
+        }
+    }
+}
+
+
+
 
 //Return the position of the output with the greatest sigmoid result
 int RetrievePos(struct Neural_Network *net)
@@ -165,7 +251,7 @@ void SaveData(struct Neural_Network *net)
 
 //Extract data previously saved in 4 files:
 //WeightIH - WeightHO - BiasH - BiasO
-struct Neural_Network* ExtractData ()
+struct Neural_Network* ExtractData()
 {
   //CREATE NN
   struct Neural_Network *net = malloc(sizeof(struct Neural_Network));
@@ -229,36 +315,38 @@ struct Neural_Network* ExtractData ()
 
 
 //softmax to determine the output layer
-float soft_max(struct Neural_Network* net)
+int soft_max(struct Neural_Network* net)
 {
-    float tablo[10] = 0.0;
-    float denominator = 0;
+    double tablo[10];
+    double denominator = 0.0;
 
     //denominator
     for (size_t i = 1; net->OutputO; i++)
     {
-        denominator += exp(net->Output[i]);
+        denominator += exp(net->OutputO[i]);
     }
 
     //applies softmax and stack it in "tablo"
     for (size_t i = 1; net->OutputO; i++)
     {
         float nominator = net->OutputO[i];
-        res[i] = nominator / denominator;
+        tablo[i] = nominator / denominator;
     }
 
-    float max = 0;
-
+    double max = 0;
+    
+    //position of the max value in array, 0 -> blank, j otherwise
+    int j;
     //determine the highest proba for each output
-    for (size_t i = 0; i < 11; i++)
+    for (j = 0; j < 11; j++)
     {
-        if (tablo[i] > max)
+        if (tablo[j] > max)
         {
-            max = tablo[i];
+            max = tablo[j];
         }
     }
     
-    return max;
+    return j;
 }
 
 

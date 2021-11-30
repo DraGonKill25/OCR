@@ -4,19 +4,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "neural_network_XOR.h"
+#include "SDL/SDL.h"
+#include "SDL/SDL_image.h"
 
-int main()
+int main(int argc, char* argv)
 {
     struct Neural_Network* nn = InitializeNetwork();
 
 
-    //trainning
-    Neural_Network_OCR(nn, input, goal);
+    //recuparation data
+    //bias & weight
+    //
+    //training
+    //Neural_Network_ORC(nn, input, goal);
+    SDL_Surface* img = NULL;
+
+    img = IMG_Load(argv[1]);
+
+    size_t size = img->w * img->h;
+
+    int* input = calloc(size, sizeof(int));
+
+    image_to_list(img, input);
+
+
 
 
     //tableau save
-    char input; 
-    char goal;
+     
+
 
     //appeler forward
     //recup les weights
