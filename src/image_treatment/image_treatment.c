@@ -542,7 +542,7 @@ SDL_Surface* resizenumber(SDL_Surface *img)
                         28,
                         28,
                         img->format->BitsPerPixel,0,0,0,0);
-  //SDL_SoftStretch(img, NULL, dest, NULL);
-  SDL_BlitScaled(img, NULL, dest, NULL);
+  SDL_SoftStretch(img, NULL, dest, NULL);
+  //SDL_BlitScaled(img, NULL, dest, NULL);
   return dest;
 }
