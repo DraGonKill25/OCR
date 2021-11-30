@@ -1,21 +1,21 @@
 CC=gcc
-CPPFLAGS= -MMD -D_XOPEN_SOURCE `pkg-config --cflags sdl`
-CFLAGS=-Wall -Wextra -Werror -std=c99 
+CPPFLAGS=
+CFLAGS=-Wall -Wextra -Werror -std=c99 $$(pkg-config --cflags sdl)
 LDFLAGS=
-LDLIBS=-lm `pkg-config --libs sdl SDL_image`
-EXEC=
+LDLIBS= -lm $$(pkg-config --libs sdl SDL_image SDL_gfx)
+EXEC=imagetreatment
 
-SRC= main.c neural_network.c neural_network_tools.c
+EXEC= main
+
+SRC= main.c
 OBJ= ${SRC:.c=.o}
 DEP= ${SRC:.c=.d}
 
-all: main 
+all: ${EXEC}
 
-main: neural_network.o main.o neural_network_tools.o
+${EXEC}: ${OBJ}
 
--include ${DEP}
-
-xor: ${OBJ}
+	${CC} ${LDLIBS} ${LDFLAGS} -o $@ $^ 
 
 clean:
-	rm -f ${OBJ} ${DEP} main
+	rm -f ${OBJ} ${DEP} ${EXEC} main

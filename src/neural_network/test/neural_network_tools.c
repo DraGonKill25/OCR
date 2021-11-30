@@ -1,11 +1,4 @@
-#include "neural_network_tools.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include <err.h>
-#include "neural_network.h"
+# include "neural_network_tools.h"
 
 //A random that returns a double in [-1; 1]
 double Random()
@@ -28,18 +21,18 @@ double Derivate_Sigmoid(double x)
 //Return the position of the output with the greatest sigmoid result
 int RetrievePos(struct Neural_Network *net)
 {
-    double max = 0;
-    int posMax = 0;
+  double max = 0;
+  int posMax = 0;
 
-    for (int o = 0; o < net -> nbOutput; o++)
+  for (int o = 0; o < net -> nbOutput; o++)
+  {
+    if (max < net -> OutputO[o])
     {
-        if (max < net -> OutputO[o])
-        {
-        posMax = o;
-        max = net -> OutputO[o];
-        }
+      posMax = o;
+      max = net -> OutputO[o];
     }
-    return posMax;
+  }
+  return posMax;
 }
 
 //Calculates the Squared error
@@ -61,7 +54,7 @@ void SquaredError(struct Neural_Network *net)
 }
 
 
-//Retrive the position of the char in the goal tab
+//Retrive the position of the digit in the goal tab
 int PosGoal(double *goal)
 {
   int count = 0;
@@ -71,6 +64,7 @@ int PosGoal(double *goal)
 
   return count;
 }
+
 //Save data of the NN in 4 files:
 //WeightIH - WeightHO - BiasH - BiasO
 void SaveData(struct Neural_Network *net)
@@ -112,18 +106,18 @@ void SaveData(struct Neural_Network *net)
 
 //Extract data previously saved in 4 files:
 //WeightIH - WeightHO - BiasH - BiasO
-struct Neural_Network* ExtractData()
+struct Neural_Network* ExtractData ()
 {
   //CREATE NN
   struct Neural_Network *net = malloc(sizeof(struct Neural_Network));
   net -> nbInput = 28*28; //size of imgs
   net -> nbHidden = 20;
-  net -> nbOutput = 52; //26*2 letters
-  net -> str = malloc(sizeof(char)*1200);
-  net -> str = "\0";
+  net -> nbOutput = 10; //10 digits
+  net -> dbl = malloc(sizeof(double)*1200);
+  net -> dbl = 0;
 
   int sizeMax = 15;
-  char *line = calloc(15, sizeof(char));
+  char *line = calloc(15, sizeof(double));
 
   //WeightIH
   FILE* weightIH = fopen("weightIH.w", "r");
@@ -131,9 +125,7 @@ struct Neural_Network* ExtractData()
   {
     for(int h = 0; h < net -> nbHidden; ++h)
     {
-      fgets(line, sizeMax, weightIH);
-      strtok(line, "\n");
-      net -> WeightIH[i][h] = atof(line);
+      net -> WeightIH[i][h] = line;
     }
   }
   fclose(weightIH);
@@ -144,9 +136,7 @@ struct Neural_Network* ExtractData()
   {
     for(int o = 0; o < net -> nbOutput; ++o)
     {
-        fgets(line, sizeMax, weightHO);
-        strtok(line, "\n");
-        net -> WeightHO[h][o] = atof(line);
+        net -> WeightHO[h][o] = line;
     }
   }
   fclose(weightHO);
@@ -173,41 +163,3 @@ struct Neural_Network* ExtractData()
 
   return net;
 }
-
-
-//softmax to determine the output layer
-int soft_max(struct Neural_Network* net)
-{
-    double tablo[10];
-    double denominator = 0.0;
-
-    //denominator
-    for (size_t i = 1; net->OutputO; i++)
-    {
-        denominator += exp(net->OutputO[i]);
-    }
-
-    //applies softmax and stack it in "tablo"
-    for (size_t i = 1; net->OutputO; i++)
-    {
-        float nominator = net->OutputO[i];
-        tablo[i] = nominator / denominator;
-    }
-
-    double max = 0;
-    
-    //position of the max value in array, 0 -> blank, j otherwise
-    int j;
-    //determine the highest proba for each output
-    for (j = 0; j < 11; j++)
-    {
-        if (tablo[j] > max)
-        {
-            max = tablo[j];
-        }
-    }
-    
-    return j;
-}
-
-

@@ -1,28 +1,26 @@
-#include "neural_network_tools.h"
-#include "neural_network.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <err.h>
+# include "neural_network.h"
+
+
 
 struct Neural_Network* InitializeNetwork()
 {
   struct Neural_Network *net = NULL;
   net = malloc(sizeof(struct Neural_Network));
   net -> nbInput = 28*28;
-  net -> nbHidden = 2;
+  net -> nbHidden = 20;
   net -> nbOutput = 10;
-  net -> ErrorRate = 0.1;
+  net -> ErrorRate = 0.0;
   net -> MaxErrorRate = 0.0;
   net -> eta = 0.5;
   net -> alpha = 0.9;
+  net -> dbl = 0.0;
 
   //Set Values
   for (int i = 0; i < net -> nbInput; i++)
   {
     for (int h = 0; h < net -> nbHidden; h++)
     {
-      net -> WeightIH[i][h] = rand();
+      net -> WeightIH[i][h] = Random();
       net -> dWeightIH[i][h] = 0.0;
     }
   }
@@ -31,15 +29,15 @@ struct Neural_Network* InitializeNetwork()
   {
     for(int o = 0; o < net -> nbOutput; o++)
     {
-      net -> WeightHO[h][o] = rand();
+      net -> WeightHO[h][o] = Random();
       net -> dWeightHO[h][o] = 0.0;
     }
-    net -> BiasH[h] = rand();
+    net -> BiasH[h] = Random();
   }
 
   for (int o = 0; o < net -> nbOutput; o++)
   {
-    net -> BiasO[o] = rand();
+    net -> BiasO[o] = Random();
     net -> dOutputO[o] = 0.0;
   }
   return net;
@@ -177,11 +175,39 @@ static void UpdateBiases(struct Neural_Network *net)
 #define KGRN  "\x1B[32m"
 #define KWHT  "\x1B[37m"
 
-//training
+void PrintState(struct Neural_Network *net)
+{
+  //Squared error function
+  SquaredError(net);
+  int output = RetrievePos(net);
+
+  //Retrive the chars : wanted & found
+  char goalChar = RetrieveChar(PosGoal(net -> Goal));
+  char recognizedChar = RetrieveChar(output);
+
+  if(net -> ErrorRate > net -> MaxErrorRate)
+    net -> MaxErrorRate = net -> ErrorRate;
+
+  //Print the progress
+  if(output == PosGoal(net -> Goal))
+    printf("Position Found = %d Expected %d %sOK \n",
+                    output, PosGoal(net -> Goal),KGRN);
+  else
+    printf("Position Found = %d Expected %d %sKO \n",
+                    output, PosGoal(net -> Goal),KRED);
+
+  printf("%s",KWHT);
+
+  printf("Char entered: %c | Char recoginized: %c | ErrorRate: %f\n",
+                                                    goalChar,
+                                                    recognizedChar,
+                                                    net -> ErrorRate);
+}
+
 void Neural_Network_OCR(struct Neural_Network *net, double *input, double *goal)
 {
   //Initialise Goals & InputValues for this char
-  for (int g = 0; g < 11; g++)
+  for (int g = 0; g < 10; g++)
   {
     net -> Goal[g] = goal[g];
   }
@@ -197,4 +223,3 @@ void Neural_Network_OCR(struct Neural_Network *net, double *input, double *goal)
   UpdateWeights(net);
   UpdateBiases(net);
 }
-
