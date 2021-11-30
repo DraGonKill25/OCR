@@ -109,7 +109,7 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
-                //double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
+                double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
 
 
                 //Median filter
@@ -120,10 +120,10 @@ int main( int argc, char* args[] )
 
 
                 //Rotation and update
-                /*sobel_surface = rotozoomSurface(screenSurface, angle, 1, 1);
+                sobel_surface = rotozoomSurface(screenSurface, angle, 1, 1);
                 screenSurface = SDL_SetVideoMode( sobel_surface->w, sobel_surface->h, 32,SDL_SWSURFACE);
                 SDL_BlitSurface(sobel_surface,NULL,screenSurface,NULL);
-                SDL_Flip(screenSurface);*/
+                SDL_Flip(screenSurface);
 
                 SDL_SaveBMP(sobel_surface, "test.bmp");
                 //Wait for a key to be pressed to end the program
