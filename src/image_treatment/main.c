@@ -83,12 +83,24 @@ int main( int argc, char* args[] )
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
 
+                //Median filter
+                MedianFilter(Loaded);
+                SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();   
+
                 //Black and White
-                colorTreatment(Loaded, 247);
+                colorTreatment(Loaded, 242);
                 SDL_SaveBMP(Loaded, "BlackAndWhite.bmp");
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
+
+                //Median filter
+                MedianFilter(Loaded);
+                SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();   
 
                 //Sobel
                 sobel_surface= SDL_CreateRGBSurface(0,Loaded->w, Loaded->h, 32, 0,0,0,0);
@@ -96,8 +108,8 @@ int main( int argc, char* args[] )
                 SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();
-                
-                double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
+
+                //double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
 
 
                 //Median filter
@@ -105,13 +117,13 @@ int main( int argc, char* args[] )
                 SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
                 wait_for_keypressed();   
-                
+
 
                 //Rotation and update
-                sobel_surface = rotozoomSurface(screenSurface, angle, 1, 1);
+                /*sobel_surface = rotozoomSurface(screenSurface, angle, 1, 1);
                 screenSurface = SDL_SetVideoMode( sobel_surface->w, sobel_surface->h, 32,SDL_SWSURFACE);
                 SDL_BlitSurface(sobel_surface,NULL,screenSurface,NULL);
-                SDL_Flip(screenSurface);
+                SDL_Flip(screenSurface);*/
 
                 SDL_SaveBMP(sobel_surface, "test.bmp");
                 //Wait for a key to be pressed to end the program
