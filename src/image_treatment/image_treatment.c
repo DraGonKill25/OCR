@@ -536,4 +536,13 @@ double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, i
 }
 
 
-
+SDL_Surface* resizenumber(SDL_Surface *img)
+{
+  SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
+                        28,
+                        28,
+                        img->format->BitsPerPixel,0,0,0,0);
+  //SDL_SoftStretch(img, NULL, dest, NULL);
+  SDL_BlitScaled(img, NULL, dest, NULL);
+  return dest;
+}
