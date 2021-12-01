@@ -124,6 +124,21 @@ int main( int argc, char* args[] )
                 screenSurface = SDL_SetVideoMode( sobel_surface->w, sobel_surface->h, 32,SDL_SWSURFACE);
                 SDL_BlitSurface(sobel_surface,NULL,screenSurface,NULL);
                 SDL_Flip(screenSurface);
+                
+
+                //Gamma
+                Gamma(sobel_surface);
+                SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();
+
+
+                //Black and White
+                colorTreatment(sobel_surface, 242);
+                SDL_SaveBMP(sobel_surface, "BlackAndWhite.bmp");
+                SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
+                SDL_Flip(screenSurface);
+                wait_for_keypressed();
 
                 SDL_SaveBMP(sobel_surface, "test.bmp");
                 //Wait for a key to be pressed to end the program

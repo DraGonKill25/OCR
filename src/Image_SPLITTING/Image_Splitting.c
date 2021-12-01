@@ -176,24 +176,106 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 double research_L(SDL_Surface *image, int x,int y,int h)
 {
     SDL_PixelFormat *Format = image->format;
-    int y1 = y+6;
-    int x1 = x+ 6;
-    while ( y1 < h && BlackorWhite(get_pixel(image,x1,y1),Format) == 1 ) // search the lenght of a small square
+    int y1 = y+1;
+    while ( y1 < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0 ) // search the lenght of a small square
     {
         y1++;
     }
-    double l = y1 - y;
+    int l = y1 - y;
     return l;
-
-    
-   
 
 }
 
+int differencebetweenL(SDL_Surface *image,int x,int y,int l){
+    int X = x + l;
+    int X1 = X + 1;
+    SDL_PixelFormat *Format = image->format;
+    int w = image->w;
+    while( X1 < w && BlackorWhite(get_pixel(image,X1,y),Format) == 1){
+        X1++;
+    }
+    return X1 - X;
+
+}
+
+int good_carre(SDL_Surface *image,int X,int Y,int l){
+    SDL_PixelFormat *Format = image->format;
+    int h = image->h;
+    int w = image->w;
+
+    if ( X > w-1 || Y > h-1)
+        return 0;
+    int X1 = X;
+    while (X1 < X + l && BlackorWhite(get_pixel(image,X1,Y),Format) == 0){
+        X1++;
+    }
+    if (X1 != X + l)
+        return 0;
+
+    int Y1 = Y;
+    while(Y1 < Y + l && BlackorWhite(get_pixel(image,X,Y1),Format) == 0){
+        Y1++;
+    }
+
+    if ( Y1 != Y + l)
+        return 0;
+    return 1;
 
 
+    
+}
 
 int Good_research(SDL_Surface *image,int x,int y){
+    SDL_PixelFormat *Format = image->format;
+    int h = image->h;
+    int w = image->w;
+
+    if (x > w-1 || y > h-1)
+        return 0;
+    if(BlackorWhite(get_pixel(image,x,y),Format) == 1)
+        return 0;
+    else{
+        // search the longueur L / 3
+        int y1 = y + 1;
+        while ( y1 < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0){
+            y1++;
+        }
+        /*
+        int x1 = x + 1;
+        while (x1 < w && BlackorWhite(get_pixel(image,x,y1),Format) == 0){
+            x1++;
+        }
+        int l = y1 - y;
+        if (l != x1 -x)
+            return 0;
+        */
+        int l = y1 - y;
+
+        //search the differences between two squares
+        int differenceL = differencebetweenL(image,x,y,l);
+
+        // test for all square if is a good square, so the grid is good
+        int Y = y;
+        int L = l * 3 + differenceL * 3;
+        if (L > w-1 || L > h-1 )
+            return 0;
+        while (Y < y + L){
+            int X = x;
+            while (X < x + L){
+                if(good_carre(image,X,Y,l) == 0)
+                    return 0;
+                X += l + differenceL;
+            }
+            Y += l + differenceL;
+
+        }
+        return 1;
+
+
+    }
+}
+
+int oldGood_research(SDL_Surface *image,int x,int y){
 
     SDL_PixelFormat *Format = image->format;
     int h = image->h;
