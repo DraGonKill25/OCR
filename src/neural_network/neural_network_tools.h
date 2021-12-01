@@ -42,7 +42,7 @@ void SquaredError(struct Neural_Network *net);
 int PosGoal(double *goal);
 
 //Retrive char from value val
-char RetrieveChar(int val);
+char RetrieveDigit(int val);
 
 //Save data of the NN in 4 files:
 //WeightIH - WeightHO - BiasH - BiasO
@@ -53,6 +53,10 @@ void SaveData(struct Neural_Network *net);
 struct Neural_Network* ExtractData ();
 
 int soft_max(struct Neural_Network* net);
+
+int PosGoal(double *goal);
+void PrintState(struct Neural_Network *net);
+
 
 
 # endif

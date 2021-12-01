@@ -7,6 +7,10 @@
 #include <err.h>
 #include "neural_network.h"
 
+#define KRED  "\x1B[31m"
+#define KGRN  "\x1B[32m"
+#define KWHT  "\x1B[37m"
+
 //A random that returns a double in [-1; 1]
 double Random()
 {
@@ -23,23 +27,6 @@ double Sigmoid(double x)
 double Derivate_Sigmoid(double x)
 {
   return x * (1.0 - x);
-}
-
-//Return the position of the output with the greatest sigmoid result
-int RetrievePos(struct Neural_Network *net)
-{
-    double max = 0;
-    int posMax = 0;
-
-    for (int o = 0; o < net -> nbOutput; o++)
-    {
-        if (max < net -> OutputO[o])
-        {
-        posMax = o;
-        max = net -> OutputO[o];
-        }
-    }
-    return posMax;
 }
 
 //Calculates the Squared error
@@ -61,16 +48,6 @@ void SquaredError(struct Neural_Network *net)
 }
 
 
-//Retrive the position of the char in the goal tab
-int PosGoal(double *goal)
-{
-  int count = 0;
-
-  while(goal[count] != 1.0)
-    count++;
-
-  return count;
-}
 //Save data of the NN in 4 files:
 //WeightIH - WeightHO - BiasH - BiasO
 void SaveData(struct Neural_Network *net)
@@ -209,5 +186,62 @@ int soft_max(struct Neural_Network* net)
     
     return j;
 }
+
+int RetrievePos(struct Neural_Network *net)
+{
+  double max = 0;
+  int posMax = 0;
+
+  for (int o = 0; o < net -> nbOutput; o++)
+  {
+    if (max < net -> OutputO[o])
+    {
+      posMax = o;
+      max = net -> OutputO[o];
+    }
+  }
+  return posMax;
+}
+
+int PosGoal(double *goal)
+{
+  int count = 0;
+
+  while(goal[count] != 1.0)
+    count++;
+
+  return count;
+}
+
+void PrintState(struct Neural_Network *net)
+{
+  //Squared error function
+  SquaredError(net);
+  int output = RetrievePos(net);
+
+  //Retrive the chars : wanted & found
+  char goalDigit = PosGoal(net -> Goal);
+  int recognizedDigit = output;
+
+  if(net -> ErrorRate > net -> MaxErrorRate)
+    net -> MaxErrorRate = net -> ErrorRate;
+
+  //Print the progress
+  if(output == PosGoal(net -> Goal))
+    printf("Position Found = %d Expected %d %sOK \n",
+                    output, PosGoal(net -> Goal),KGRN);
+  else
+    printf("Position Found = %d Expected %d %sKO \n",
+                    output, PosGoal(net -> Goal),KRED);
+
+  printf("%s",KWHT);
+
+  printf("Char entered: %d | Char recoginized: %d | ErrorRate: %f\n",
+                                                    goalDigit,
+                                                    recognizedDigit,
+                                                    net -> ErrorRate);
+}
+
+
 
 

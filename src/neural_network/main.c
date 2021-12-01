@@ -11,7 +11,7 @@
 #define KWHT  "\x1B[37m"
 
 
-double goal[10][10] = {
+/*double goal[10][10] = {
     {1,0,0,0,0,0,0,0,0,0},//0 // Blank
     {0,1,0,0,0,0,0,0,0,0},//1
     {0,0,1,0,0,0,0,0,0,0},//2
@@ -22,11 +22,7 @@ double goal[10][10] = {
     {0,0,0,0,0,0,0,1,0,0},//7
     {0,0,0,0,0,0,0,0,1,0},//8
     {0,0,0,0,0,0,0,0,0,1}//9
-};
-
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KWHT  "\x1B[37m"
+};*/
 
 
 int trainNN()
@@ -42,7 +38,8 @@ int trainNN()
     struct Neural_Network *net = InitializeNetwork();
 
     //Initialize all goals & letters
-    double *digits = Input;
+    double **digits = digitsMatrix();
+    double **goal = goalMatrix();
 
     for (int epoch = 0; epoch < nbEpoch; epoch++)
     {
@@ -55,7 +52,7 @@ int trainNN()
 
             if (epoch % 100 == 0)
             {
-                //PrintState(net);
+                PrintState(net);
             }
             //count++;
         }

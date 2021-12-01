@@ -106,25 +106,134 @@ void image_to_list(SDL_Surface* image_surface, int* input)
     }
 }
 
+//Create the .txt file with the values of pixels
+void create_matrix_file(SDL_Surface *img, char *filename)
+{
+    //Variables
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+
+    strtok(filename,".");
+    strcat(filename,".txt");
+    FILE *file = fopen(filename,"w");
+    printf("%s \n",filename);
+
+    for(int i = 0; i < img -> h; i++)
+    {
+        for(int j = 0;j < img -> w; j++)
+        {
+            Uint32 pixel = get_pixel(img, j, i);
+            SDL_GetRGB(pixel, img -> format, &r, &g, &b);
+            if(r == 0 && g == 0 && b == 0)
+                fputs("1",file);
+            else
+                fputs("0",file);
+        }
+        fputs("\n",file);
+    }
+    fclose(file);
+}
+
+
+double *goalArray(int digit)
+{
+  double *goal = calloc(10, sizeof(double));
+    goal[digit] = 1;
+  return goal;
+}
+
+//Create & return all the goals matrixes (for all letters)
+double **goalMatrix()
+{
+  double **goalMatrix = malloc(sizeof(double*) * 10);
+  int digit = 0;
+  for(int i = 0; i < 10; i++)
+  {
+      goalMatrix[i] = goalArray(digit);
+      digit++;
+  }
+  return goalMatrix;
+}
+
+double *matrixFromFile(char *filename)
+{
+  double *matrix = malloc(sizeof(double) * 28 * 28);
+  FILE *file = fopen(filename,"r");
+
+  if(file == NULL)
+    printf("File is NULL \n");
+  for(int i = 0; i <= 28; i++)
+  {
+    for(int j = 0; j <= 28; j++)
+    {
+      int c = fgetc(file);
+      if(c == 49)
+        matrix[j+i*28] = 1;
+      if(c == 48)
+        matrix[j+i*28] = 0;
+    }
+  }
+  fclose(file);
+  //printf("%s\n", *matrix);
+  return matrix;
+}
+
+double **digitsMatrix()
+{
+    //Variables
+    char digit_path[50] = "0.txt\0";
+    double **digitMatrix = malloc(sizeof(double *) * 10);
+    char digit = '0';
+
+    for(int i = 0; i < 10; i++)
+    {
+        //printf("%c\n", digit);
+        digit_path[0] = digit;
+        //printf("%s\n",digit_path);
+        digitMatrix[i] = matrixFromFile(digit_path);
+        digit++;
+
+
+    }
+    return digitMatrix;
+}
+SDL_Surface* resizenumber(SDL_Surface *img);
+
 double *create_matrix(SDL_Surface *img)
 {
+
+  SDL_Surface *imgnew = resizenumber(img);
   //Variables
   double *digitMatrix = malloc(sizeof(double) * 28 * 28);
   Uint8 r;
   Uint8 g;
   Uint8 b;
 
-  for(int i = 0; i < img -> h; i++)
+  for(int i = 0; i < imgnew -> h; i++)
   {
-      for(int j = 0; j < img -> w; j++)
+      for(int j = 0; j < imgnew -> w; j++)
       {
-          Uint32 pixel = get_pixel(img, j, i);
-          SDL_GetRGB(pixel, img -> format, &r, &g, &b);
+          Uint32 pixel = get_pixel(imgnew, j, i);
+          SDL_GetRGB(pixel, imgnew -> format, &r, &g, &b);
           if(r == 0 && g == 0 && b == 0)
-              Matrix[j + i * img -> w] = 1;
+              digitMatrix[j + i * imgnew -> w] = 1;
           else
-              digitMatrix[j + i * img -> w] = 0;
+              digitMatrix[j + i * imgnew -> w] = 0;
       }
   }
   return digitMatrix;
 }
+
+
+SDL_Surface* resizenumber(SDL_Surface *img)
+{
+  SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
+                        28,
+                        28,
+                        img->format->BitsPerPixel,0,0,0,0);
+  SDL_SoftStretch(img, NULL, dest, NULL);
+  //SDL_BlitScaled(img, NULL, dest, NULL);
+  return dest;
+}
+
