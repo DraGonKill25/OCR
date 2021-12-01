@@ -7,7 +7,7 @@ EXEC=imagetreatment
 
 EXEC= main
 
-SRC= main.c
+SRC= main.c neural_network.c neural_network_tools.c sdl_tools.c
 OBJ= ${SRC:.c=.o}
 DEP= ${SRC:.c=.d}
 

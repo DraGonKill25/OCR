@@ -105,3 +105,26 @@ void image_to_list(SDL_Surface* image_surface, int* input)
         }
     }
 }
+
+double *create_matrix(SDL_Surface *img)
+{
+  //Variables
+  double *digitMatrix = malloc(sizeof(double) * 28 * 28);
+  Uint8 r;
+  Uint8 g;
+  Uint8 b;
+
+  for(int i = 0; i < img -> h; i++)
+  {
+      for(int j = 0; j < img -> w; j++)
+      {
+          Uint32 pixel = get_pixel(img, j, i);
+          SDL_GetRGB(pixel, img -> format, &r, &g, &b);
+          if(r == 0 && g == 0 && b == 0)
+              Matrix[j + i * img -> w] = 1;
+          else
+              digitMatrix[j + i * img -> w] = 0;
+      }
+  }
+  return digitMatrix;
+}
