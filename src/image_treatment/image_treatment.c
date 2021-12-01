@@ -546,3 +546,36 @@ SDL_Surface* resizenumber(SDL_Surface *img)
   //SDL_BlitScaled(img, NULL, dest, NULL);
   return dest;
 }
+
+Uint32 Toblack(Uint32 Pixel, SDL_PixelFormat *Format, int value)
+{
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+    SDL_GetRGB(Pixel, Format, &r, &g, &b);
+    if ((r + g + b) / 3 < value)
+    {
+        return SDL_MapRGB(Format, 255, 255, 255);
+    }
+    else
+    {
+        return SDL_MapRGB(Format, 0, 0, 0);
+    }
+}
+void colorTreatment2(SDL_Surface *image, int value)
+{
+    int i, j;
+    SDL_LockSurface(image);
+    int h = image->h;
+    int w = image->w;
+    SDL_PixelFormat* Format = image->format;
+    for(i = 0; i < h; i++)
+    {
+        for(j = 0; j < w; j++)
+        {
+            put_pixel(image,j,i,Toblack(get_pixel(image,j,i), Format, value));
+        }
+    }
+    SDL_UnlockSurface(image);
+}
+

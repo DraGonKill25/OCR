@@ -26,6 +26,10 @@ void SobelEdgeDetection(SDL_Surface *in, SDL_Surface *out, double threshold);
 void DrawLine_v3(SDL_Surface *img, int x0, int y0, int x1, int y1, float wd, Uint32 pixel_color);
 void Flip(SDL_Surface *img);
 double HoughTransformAngleDetection(SDL_Surface *edge_image, SDL_Surface *src, int num_thetas, int num_rhos, int threshold);//, char *line_color);
+Uint32 Toblack(Uint32 Pixel, SDL_PixelFormat *Format, int value);
+void colorTreatment2(SDL_Surface *image, int value);
+
+
 
 
 

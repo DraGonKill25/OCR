@@ -171,59 +171,59 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 // we return 0 if the position x and y is not the first of a sudoku grid 
 // we return 1 if the position x and y is the first position of a sudoku grid
 
+int differenceLX(SDL_Surface *image,int x1,int y,int w){
+    SDL_PixelFormat *Format = image->format;
+    int newx = x1 + 1;
+    while ( newx < w && BlackorWhite(get_pixel(image,newx,y),Format) == 1){
+        newx++;
+    }
+    return newx - x1;
+}
 
 
-double research_L(SDL_Surface *image, int x,int y,int h)
+int differenceLY(SDL_Surface *image,int x,int y1,int h){
+    SDL_PixelFormat *Format = image->format;
+    int newy = y1 + 1;
+    while ( newy < h && BlackorWhite(get_pixel(image,x,newy),Format) == 1){
+        newy++;
+    }
+    return newy - y1;
+}
+
+
+int research_LX(SDL_Surface *image,int x,int y,int w){
+    SDL_PixelFormat *Format = image->format;
+    int x1 = x+1;
+    int compteur = 0;
+    while(compteur < 3){
+        while ( x1  < w && BlackorWhite(get_pixel(image,x1,y),Format) == 0 ){ // search the lenght of longueur in X{
+            x1++;
+        }
+        compteur += 1;
+    }
+    int L = x1 - x;
+    return L;
+
+
+}
+int research_LY(SDL_Surface *image, int x,int y,int h)
 {
     SDL_PixelFormat *Format = image->format;
     int y1 = y+1;
-    while ( y1 < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0 ) // search the lenght of a small square
-    {
-        y1++;
+    int compteur = 0;
+    while(compteur < 3){
+        while ( y1  < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0 ){ // search the lenght of longueur Y{
+            y1++;
+        }
+        //if (differenceLY(image,x,y1,h) > 15)
+           // return 0;
+        compteur += 1;
     }
-    int l = y1 - y;
-    return l;
+    int L = y1 - y;
+    return L;
 
 }
 
-int differencebetweenL(SDL_Surface *image,int x,int y,int l){
-    int X = x + l;
-    int X1 = X + 1;
-    SDL_PixelFormat *Format = image->format;
-    int w = image->w;
-    while( X1 < w && BlackorWhite(get_pixel(image,X1,y),Format) == 1){
-        X1++;
-    }
-    return X1 - X;
-
-}
-
-int good_carre(SDL_Surface *image,int X,int Y,int l){
-    SDL_PixelFormat *Format = image->format;
-    int h = image->h;
-    int w = image->w;
-
-    if ( X > w-1 || Y > h-1)
-        return 0;
-    int X1 = X;
-    while (X1 < X + l && BlackorWhite(get_pixel(image,X1,Y),Format) == 0){
-        X1++;
-    }
-    if (X1 != X + l)
-        return 0;
-
-    int Y1 = Y;
-    while(Y1 < Y + l && BlackorWhite(get_pixel(image,X,Y1),Format) == 0){
-        Y1++;
-    }
-
-    if ( Y1 != Y + l)
-        return 0;
-    return 1;
-
-
-    
-}
 
 int Good_research(SDL_Surface *image,int x,int y){
     SDL_PixelFormat *Format = image->format;
@@ -235,42 +235,13 @@ int Good_research(SDL_Surface *image,int x,int y){
     if(BlackorWhite(get_pixel(image,x,y),Format) == 1)
         return 0;
     else{
-        // search the longueur L / 3
-        int y1 = y + 1;
-        while ( y1 < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0){
-            y1++;
-        }
-        /*
-        int x1 = x + 1;
-        while (x1 < w && BlackorWhite(get_pixel(image,x,y1),Format) == 0){
-            x1++;
-        }
-        int l = y1 - y;
-        if (l != x1 -x)
+        int LX = research_LX(image,x,y,w);
+        int LY = research_LY(image,x,y,h);
+        if (LX < w / 3 || LY < h / 3)
             return 0;
-        */
-        int l = y1 - y;
-
-        //search the differences between two squares
-        int differenceL = differencebetweenL(image,x,y,l);
-
-        // test for all square if is a good square, so the grid is good
-        int Y = y;
-        int L = l * 3 + differenceL * 3;
-        if (L > w-1 || L > h-1 )
-            return 0;
-        while (Y < y + L){
-            int X = x;
-            while (X < x + L){
-                if(good_carre(image,X,Y,l) == 0)
-                    return 0;
-                X += l + differenceL;
-            }
-            Y += l + differenceL;
-
-        }
-        return 1;
-
+        if (LX - LY < 10 && LX - LY > -10)
+            return 1;
+        return 0;
 
     }
 }
@@ -487,14 +458,18 @@ int main(int argc, char* argv[])
             y++;
         }
         x++;
-    }
-    double l = research_L(image_surface,x,y,height);
-    printf("%d + %f\n",res,l);
-    printf("x=%d and y=%d\n",x,y);
     
+    }
+    int l = research_LX(image_surface,x,y,height);
+    if (l < width / 3)
+        l *= 3;
+    else if ( l < width / 9)
+        l *= 9;
+    printf("%d + %d\n",res,l);
+    printf("x=%d and y=%d\n",x,y);
     //search_grille(image_surface);
     
-    image_surface = Zoom(image_surface, x,x + l*9, l, y,y + l*9);
+    image_surface = Zoom(image_surface, x,x + l, l, y,y + l);
     save_cells(image_surface);
     wait_for_keypressed();
     SDL_FreeSurface(image_surface);
