@@ -315,15 +315,15 @@ int oldGood_research(SDL_Surface *image,int x,int y){
 }
 */
 
-/*
-SDL_Surface* ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
+
+SDL_Surface *ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
 {
     Uint8 r,g,b;
     Uint32 pixel;
-    SDL_Surface* result = SDL_CreateRGBSurface(0,28,28,32,0,0,0,0);
-    for(int y = 0; y < abs(y1-y2); y++)
+    SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
+    for(int y = 0; y < y2; y++)
     {
-        for(int x = 0; x < abs(x2-l); x++)
+        for(int x = 0; x < x2; x++)
         {
             pixel = get_pixel(img,x+x1,y+y1);
             SDL_GetRGB(pixel,img -> format, &r,&g,&b);
@@ -334,17 +334,15 @@ SDL_Surface* ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
     return result;
 }
 
-*/
 
 
-
-/*
 void save_cellsGrille(SDL_Surface* img,int x,int y, int l){
-    int xf = x + l * 9;
-    int yf = y + l * 9;
-    img = ZoomGrille(img, x, xf, l * 9, y, yf);
+    int xf = x + l;
+    int yf = y + l;
+    SDL_Surface *result  = ZoomGrille(img, x, xf, l, y, yf);
+    SDL_SaveBMP(result,"testHugo.bmp");
+
 }
-*/
 
 
 /*
@@ -377,14 +375,15 @@ void search_grille(SDL_Surface *image)
 
 
 
-SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
+
+SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int x3, int y1, int y4)//, int j, int i)
 {
     Uint8 r,g,b;
     Uint32 pixel;
-    SDL_Surface* result = SDL_CreateRGBSurface(0,abs(x2-l),abs(y1-y2),32,0,0,0,0);
-    for(int y = 0; y < abs(y1-y2); y++)
+    SDL_Surface* result = SDL_CreateRGBSurface(0,abs(x2-x3),abs(y1-y4),32,0,0,0,0);
+    for(int y = 0; y < abs(y1-y4); y++)
     {
-        for(int x = 0; x < abs(x2-l); x++)
+        for(int x = 0; x < abs(x2-x3); x++)
         {
             pixel = get_pixel(img,x+x1,y+y1);
             SDL_GetRGB(pixel,img -> format, &r,&g,&b);
@@ -394,6 +393,8 @@ SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
     }
     return result;
 }
+
+
 
 void save_cells(SDL_Surface* img){
     int w = img -> w;
@@ -447,10 +448,15 @@ int main(int argc, char* argv[])
         l *= 3;
     else if ( l < width / 9)
         l *= 9;
+
     printf("%d\n",l);
     printf("x=%d and y=%d\n",x,y);
-    image_surface = Zoom(image_surface, x,x + l, l, y,y + l);
-    save_cells(image_surface);
+    SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
+
+    save_cellsGrille(image_surface,x,y, l);
+
+
+    save_cells(result);
     wait_for_keypressed();
     SDL_FreeSurface(image_surface);
 
