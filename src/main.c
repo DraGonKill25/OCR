@@ -16,9 +16,9 @@ SDL_Surface * Loaded = NULL;
 gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data);
 void on_MainButton_clicked(); 
 void update_preview_cb (GtkFileChooser *file_chooser, gpointer data);
-void on_MainButton_clicked(gpointer data);
-void clockwise(gpointer data);
-void cclockwise(gpointer data);
+void on_MainButton_clicked(GtkButton *button, gpointer data);
+void clockwise(GtkButton *button, gpointer data);
+void cclockwise(GtkButton *button, gpointer data);
 int main_treat();
 
 
@@ -76,8 +76,9 @@ void update_preview_cb (GtkFileChooser *file_chooser, gpointer data)
   gtk_file_chooser_set_preview_widget_active (file_chooser, have_preview);
 }
 
-void on_MainButton_clicked(gpointer data)
+void on_MainButton_clicked(GtkButton *button, gpointer data)
 {
+    GTK_WIDGET(button);
     GtkWidget *image = data;
     GdkPixbuf *pixbuf;
     if (filename != NULL)
@@ -85,7 +86,7 @@ void on_MainButton_clicked(gpointer data)
         main_treat();
         // No file chosen wip
 
-        pixbuf = gdk_pixbuf_new_from_file_at_size("splitting.bmp", 750,750,NULL);
+        pixbuf = gdk_pixbuf_new_from_file_at_size("Splitting.bmp", 750,750,NULL);
         gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
     
 
@@ -94,8 +95,9 @@ void on_MainButton_clicked(gpointer data)
     }
 }
 
-void clockwise(gpointer data)
+void clockwise(GtkButton *button, gpointer data)
 {
+    GTK_WIDGET(button);
     GtkWidget *image = data;
     if (image != NULL)
     {
@@ -115,8 +117,9 @@ void clockwise(gpointer data)
     }
 }
 
-void cclockwise(gpointer data)
+void cclockwise(GtkButton *button, gpointer data)
 {
+    GTK_WIDGET(button);
     GtkWidget *image = data;
     if (image != NULL)
     {
@@ -152,7 +155,6 @@ gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data)
 
     gtk_widget_show(image);
 
-    printf("File chosen! %s", filename);
     return FALSE;
 }
 
@@ -160,8 +162,6 @@ gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data)
 int main_treat()
 {
 
-    //The surface of the image we are gonna load
-    SDL_Surface * Loaded = NULL;
 
     //The surface for sobel
     SDL_Surface *sobel_surface=NULL;
@@ -209,17 +209,18 @@ int main_treat()
             wait_for_keypressed();
             */
 
-            // double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
+            //double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
 
+            //printf("%f", angle);
             //To black
-            colorTreatment(Loaded, 30);
+            colorTreatment2(Loaded, 30);
 
 
             //Median filter
             MedianFilter(Loaded);
 
             // Rotation and update with hough angle
-            // Loaded  = rotozoomSurface(screenSurface, angle, 1, 1);
+            //Loaded = rotozoomSurface(Loaded, angle, 1, 1);
 
 
             SDL_SaveBMP(Loaded, "Splitting.bmp");
@@ -239,8 +240,7 @@ int main_treat()
             SDL_Flip(screenSurface);
             wait_for_keypressed();*/
 
-            //Wait for a key to be pressed to end the program
-            wait_for_keypressed();
+
             
         }
     }
