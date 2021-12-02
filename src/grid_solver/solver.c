@@ -6,13 +6,15 @@
 //i will add a Makefile excpecialy for this part later
 //for just try to make all the function work corretly
 
-int Grid_Check(int grid[9][9], int row, int col, int num){
+int Grid_Check(int grid[9][9], int row, int col, int num)
+{
 
     int rowStart = (row/3) * 3;   //it will start a the upper left of the square
     int colStart = (col/3) * 3;   //and at the right hight
     int i;
 
-    for(i=0; i<9; ++i){
+   for(i=0; i<9; ++i)
+   {
 
         if (grid[row][i] == num) return 0;//check if the number exist in the col
         if (grid[i][col] == num) return 0;//check if the number exist in the row
@@ -23,12 +25,13 @@ int Grid_Check(int grid[9][9], int row, int col, int num){
     return 1;
 }
 
-int Solve_Sudoku(int grid[9][9], int row, int col){
+int Solve_Sudoku(int g0rid[9][9], int row, int col)
+{
 
-    if(row<9 && col<9){//check if we are still in the grid
+    if(row<9 && col<9)0{//check if we are still in the grid
 
-        if(grid[row][col]){
-
+        if(grid[row][col])
+        {
             //ckeck if we can call the function on the next col
             if((col+1)<9) return Solve_Sudoku(grid, row, col+1);
             //else check if we can call the function on the next raw
@@ -37,21 +40,26 @@ int Solve_Sudoku(int grid[9][9], int row, int col){
             //position so we return true
             else return 1;
         }
-        else{
+        else
+        {
 
-            for(int i=1; i<10; i++){//value of the case
+            for(int i=1; i<10; i++)
+            {//value of the case
 
-                if(Grid_Check(grid, row, col, i)){//check each cell
+                if(Grid_Check(grid, row, col, i))
+                {//check each cell
 
                     grid[row][col] = i;
-                    if((col+1)<9){
+                    if((col+1)<9)
+                    {
 
                         if(Solve_Sudoku(grid, row, col +1))
                             return 1;
                         else grid[row][col] = 0;
                     }
 
-                    else if((row+1)<9){
+                    else if((row+1)<9)
+                    {
 
                         if(Solve_Sudoku(grid, row+1, 0))
                             return 1;
@@ -70,14 +78,16 @@ int Solve_Sudoku(int grid[9][9], int row, int col){
 }
 
 
-int change_dot(char toto){
+int change_dot(char toto)
+{
 
     if(toto =='.')
         return 0;
     return (int)(toto - '0');//give each int value of each char of the source file
 }
 
-void write_file(char *file_name, int grid[9][9]){
+void write_file(char *file_name, int grid[9][9])
+{
 
     //create the file name in a good format
     int l = strlen(file_name);
@@ -103,18 +113,21 @@ void write_file(char *file_name, int grid[9][9]){
     file = fopen(result_name, "w");
 
 
-    for (size_t i = 0; i < 9; i++){
+    for (size_t i = 0; i < 9; i++)
+    {
         //put each caractere at the good place and
         //check when go to an other line
 
-        for (size_t j = 0; j < 9; j++){
+        for (size_t j = 0; j < 9; j++)
+        {
 
             fputc(48 + grid[i][j], file);
 
-            if ((j + 1) % 3 == 0 && (j != 8)){
+            if ((j + 1) % 3 == 0 && (j != 8))
+            {
                 fputc(32,file);
                 fputc(32,file);
-            }
+           }
         }
 
         if ((i + 1) % 3 == 0)
@@ -125,3 +138,6 @@ void write_file(char *file_name, int grid[9][9]){
 
     fclose(file);
 }
+
+
+

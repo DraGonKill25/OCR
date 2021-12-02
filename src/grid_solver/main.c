@@ -5,7 +5,8 @@
 #include "solver.h"
 
 
-int main(int argc,  char *argv[]){
+int main(int argc,  char *argv[])
+{
 
     if (argc>2||argc<2)
         errx(1,"The number of arguments is not valid");
@@ -20,24 +21,29 @@ int main(int argc,  char *argv[]){
         exit(1);
 
     //read the file and take each caractere in a grid at the good place
-    while((c = (fgetc(file))) != EOF){
+    while((c = (fgetc(file))) != EOF)
+    {
 
-        if(i==9){
+        if(i==9)
+        {
             i=0;
             j+=1;
         }
 
         if(c == ' ' || c == '\r' || c=='\n' || c=='\f' || c=='\0')
             continue;
-        else{
+        else
+        {
             toto[j][i]= c;
             i++;
         }
     }
 
     //put the char into int number
-    for(int x=0; x<9; x++){
-        for(int y=0; y<9; y++){
+    for(int x=0; x<9; x++)
+    {
+        for(int y=0; y<9; y++)
+        {
             good_one[x][y] = (change_dot(toto[x][y]));
         }
     }

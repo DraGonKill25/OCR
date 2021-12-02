@@ -1,8 +1,8 @@
 CC=gcc
 CPPFLAGS= -MMD -D_XOPEN_SOURCE
-CFLAGS=-Wall -Werror -Wextra -std=c99 -O1
+CFLAGS=-Wall -Wextra -std=c99 -O1 $$(pkg-config --cflags sdl SDL_image SDL_gfx)
 LDFLAGS=
-LDLIBS=
+LDLIBS= -lm $$(pkg-config --libs sdl SDL_image SDL_gfx)
 EXEC=
 
 SRC= main.c
@@ -13,8 +13,8 @@ all: display
 
 -include ${DEP}
 
-solver: ${OBJ}
+display: ${OBJ}
 
 clean:
-	rm -f *.d *.o *.result solver
+	rm -f *.d *.o display
 
