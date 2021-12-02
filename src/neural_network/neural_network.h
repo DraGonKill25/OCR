@@ -43,7 +43,7 @@ struct Neural_Network
     double eta;
     double alpha;
 
-    char *str;
+    char *str[81];
 };
 
 

@@ -58,5 +58,7 @@ int PosGoal(double *goal);
 void PrintState(struct Neural_Network *net);
 
 char RetrieveChar(int val);
+char DetectText(struct Neural_Network *net, double* letter);
+char DetectText(struct Neural_Network *net, double* letter);
 
 # endif

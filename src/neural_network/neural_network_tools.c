@@ -213,85 +213,26 @@ int PosGoal(double *goal)
   return count;
 }
 
-//Retrive char from value val
-char RetrieveChar(int val)
-{
-  char c;
-
-  if(val <= 25)
-  {
-    c = val + 65;
-  }
-  else if(val > 25 && val <= 51)
-  {
-    c = (val + 97 - 26);
-  }
-  else if(val > 51 && val <= 61)
-  {
-    c = val + 48 - 52;
-  }
-  else
-  {
-    switch(val)
-    {
-      case 62:
-        c = ';';
-        break;
-      case 63:
-        c = '\'';
-        break;
-      case 64:
-        c = ':';
-        break;
-      case 65:
-        c = '-';
-        break;
-      case 66:
-        c = '.';
-        break;
-      case 67:
-        c = '!';
-        break;
-      case 68:
-        c = '?';
-        break;
-      case 69:
-        c = '(';
-        break;
-      case 70:
-        c = '\"';
-        break;
-      case 71:
-        c = ')';
-        break;
-      default:
-        exit(1);
-        break;
-    }
-  }
-  return c;
-}
-
 void PrintState(struct Neural_Network *net)
 {
   //Squared error function
   SquaredError(net);
-  int output = RetrievePos(net);
+  int output = RetrievePos(net) + 1;
 
   //Retrive the chars : wanted & found
-  char goalDigit = RetrieveChar(PosGoal(net -> Goal));
-  char recognizedDigit = RetrieveChar(output);
+  char goalDigit = PosGoal(net -> Goal) + 1;
+  char recognizedDigit = output;
 
   if(net -> ErrorRate > net -> MaxErrorRate)
     net -> MaxErrorRate = net -> ErrorRate;
 
   //Print the progress
-  if(output == PosGoal(net -> Goal))
+  if(output == PosGoal(net -> Goal) + 1)
     printf("Position Found = %d Expected %d %sOK \n",
-                    output, PosGoal(net -> Goal),KGRN);
+                    output, PosGoal(net -> Goal)+1,KGRN);
   else
     printf("Position Found = %d Expected %d %sKO \n",
-                    output, PosGoal(net -> Goal),KRED);
+                    output, PosGoal(net -> Goal)+1,KRED);
 
   printf("%s",KWHT);
 
@@ -300,4 +241,87 @@ void PrintState(struct Neural_Network *net)
                                                     recognizedDigit,
                                                     net -> ErrorRate);
 }
+
+static void ForwardPass(struct Neural_Network *net)
+{
+  double sum, weight, output, bias;
+
+  //Calculate Output for Hidden neurons
+  for (int h = 0; h < net -> nbHidden; h++)
+  {
+    sum = 0.0;
+    for (int i = 0; i < net -> nbInput; i++)
+    {
+      weight = net -> WeightIH[i][h];
+      output = net -> OutputI[i];
+
+      sum += weight * output;
+    }
+    bias = net -> BiasH[h];
+    net -> OutputH[h] = Sigmoid(sum + bias);
+  }
+
+  //Calculate Output for Output neurons
+  for (int o = 0; o < net -> nbOutput; o++)
+  {
+    sum = 0.0;
+    for (int h = 0; h < net -> nbHidden; h++)
+    {
+      weight = net -> WeightHO[h][o];
+      output = net -> OutputH[h];
+
+      sum += weight * output;
+    }
+    bias = net -> BiasO[o];
+    net -> OutputO[o] = Sigmoid(sum + bias);
+  }
+}
+
+char DetectText(struct Neural_Network *net, double* letter)
+{
+    for(int i = 0; i < net -> nbInput; i++)
+    {
+        net -> OutputI[i] = letter[i];
+    }
+
+    ForwardPass(net);
+
+    //Retrieve the character detected
+    int pos = RetrievePos(net);
+    char c;
+
+    switch(pos)
+    {
+        case 0:
+            c = '1';
+            break;
+        case 1:
+            c = '2';
+            break;
+        case 2:
+            c = '3';
+            break;
+        case 3:
+            c = '4';
+            break;
+        case 4:
+            c = '5';
+            break;
+        case 5:
+            c = '6';
+            break;
+        case 6:
+            c = '7';
+            break;
+        case 7:
+            c = '8';
+            break;
+        case 8:
+            c = '9';
+            break;
+    }
+
+    return c;
+}
+
 

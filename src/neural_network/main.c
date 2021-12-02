@@ -63,7 +63,7 @@ int trainNN()
 
     for (int epoch = 0; epoch < nbEpoch; epoch++)
     {
-        currentDigit = 0;
+        currentDigit = 0; //+1
         for (int l = 0; l < nbDigits; l++)
         {
 

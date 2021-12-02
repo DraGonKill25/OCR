@@ -22,7 +22,7 @@ struct Neural_Network* InitializeNetwork()
   {
     for (int h = 0; h < net -> nbHidden; h++)
     {
-      net -> WeightIH[i][h] = rand();
+      net -> WeightIH[i][h] = Random();
       net -> dWeightIH[i][h] = 0.0;
     }
   }
@@ -31,15 +31,16 @@ struct Neural_Network* InitializeNetwork()
   {
     for(int o = 0; o < net -> nbOutput; o++)
     {
-      net -> WeightHO[h][o] = rand();
+      net -> WeightHO[h][o] = Random();
+      printf("%f \n", net -> WeightHO[h][o]);
       net -> dWeightHO[h][o] = 0.0;
     }
-    net -> BiasH[h] = rand();
+    net -> BiasH[h] = Random();
   }
 
   for (int o = 0; o < net -> nbOutput; o++)
   {
-    net -> BiasO[o] = rand();
+    net -> BiasO[o] = Random();
     net -> dOutputO[o] = 0.0;
   }
   return net;
@@ -167,6 +168,7 @@ static void UpdateBiases(struct Neural_Network *net)
   {
     delta = net -> dOutputO[o];
     dBias = eta * delta;
+    //printf("%f \n", dBias);
 
     net -> BiasO[o] += dBias;
   }
@@ -180,6 +182,7 @@ static void UpdateBiases(struct Neural_Network *net)
 //training
 void Neural_Network_OCR(struct Neural_Network *net, double *input, double *goal)
 {
+
   //Initialise Goals & InputValues for this digit
   for (int g = 0; g < 9; g++)
   {
