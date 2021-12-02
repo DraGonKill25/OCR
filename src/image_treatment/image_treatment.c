@@ -553,7 +553,7 @@ Uint32 Toblack(Uint32 Pixel, SDL_PixelFormat *Format, int value)
     Uint8 g;
     Uint8 b;
     SDL_GetRGB(Pixel, Format, &r, &g, &b);
-    if ((r + g + b) / 3 > value)
+    if ((r + g + b) / 3 < value)
     {
         return SDL_MapRGB(Format, 0, 0, 0);
     }

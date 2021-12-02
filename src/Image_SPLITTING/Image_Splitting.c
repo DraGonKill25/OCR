@@ -154,8 +154,8 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
     Uint8 b;
     SDL_GetRGB(Pixel,Format,&r, &g, &b);
     if ((r + g + b) / 3 > 240 )
-        return 0;
-    return 1;
+        return 1;
+    return 0;
 
 }
 
@@ -336,11 +336,13 @@ SDL_Surface *ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
 
 
 
-void save_cellsGrille(SDL_Surface* img,int x,int y, int l){
+SDL_Surface *save_cellsGrille(SDL_Surface* img,int x,int y, int l){
     int xf = x + l;
     int yf = y + l;
     SDL_Surface *result  = ZoomGrille(img, x, xf, l, y, yf);
     SDL_SaveBMP(result,"testHugo.bmp");
+
+    return result;
 
 }
 
@@ -453,7 +455,7 @@ int main(int argc, char* argv[])
     printf("x=%d and y=%d\n",x,y);
     SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
 
-    save_cellsGrille(image_surface,x,y, l);
+    result = save_cellsGrille(image_surface,x,y, l);
 
 
     save_cells(result);
