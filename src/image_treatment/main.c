@@ -111,7 +111,7 @@ int main( int argc, char* args[] )
                 wait_for_keypressed();
                 */
 
-                // double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
+                double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
                 
 
                 //To black
@@ -131,7 +131,7 @@ int main( int argc, char* args[] )
 
 
                 //Rotation and update
-                Loaded  = rotozoomSurface(screenSurface, 90, 1, 1);
+                Loaded  = rotozoomSurface(screenSurface, angle, 1, 1);
                 screenSurface = SDL_SetVideoMode( Loaded->w, Loaded->h, 32,SDL_SWSURFACE);
                 SDL_BlitSurface(Loaded,NULL,screenSurface,NULL);
                 SDL_Flip(screenSurface);

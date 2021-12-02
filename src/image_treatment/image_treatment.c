@@ -555,11 +555,11 @@ Uint32 Toblack(Uint32 Pixel, SDL_PixelFormat *Format, int value)
     SDL_GetRGB(Pixel, Format, &r, &g, &b);
     if ((r + g + b) / 3 > value)
     {
-        return SDL_MapRGB(Format, 255, 255, 255);
+        return SDL_MapRGB(Format, 0, 0, 0);
     }
     else
     {
-        return SDL_MapRGB(Format, 0, 0, 0);
+        return SDL_MapRGB(Format, 255, 255, 255);
     }
 }
 void colorTreatment2(SDL_Surface *image, int value)

@@ -88,6 +88,8 @@ void on_MainButton_clicked(GtkButton *button, gpointer data)
 
         pixbuf = gdk_pixbuf_new_from_file_at_size("Splitting.bmp", 750,750,NULL);
         gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
+
+        Loaded = IMG_Load("Splitting.bmp");
     
 
         if (pixbuf)
@@ -200,16 +202,12 @@ int main_treat()
 
             //Median filter
             MedianFilter(Loaded);
-            /*
+            
             //Sobel
             sobel_surface= SDL_CreateRGBSurface(0,Loaded->w, Loaded->h, 32, 0,0,0,0);
             SobelEdgeDetection(Loaded, sobel_surface, 0.02);
-            SDL_BlitSurface(sobel_surface, NULL, screenSurface, NULL);
-            SDL_Flip(screenSurface);
-            wait_for_keypressed();
-            */
 
-            //double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
+            double angle = HoughTransformAngleDetection(sobel_surface, Loaded, 180, 180, 3);//, "blue");
 
             //printf("%f", angle);
             //To black
@@ -220,7 +218,7 @@ int main_treat()
             MedianFilter(Loaded);
 
             // Rotation and update with hough angle
-            //Loaded = rotozoomSurface(Loaded, angle, 1, 1);
+            Loaded = rotozoomSurface(Loaded, angle, 1, 1);
 
 
             SDL_SaveBMP(Loaded, "Splitting.bmp");
