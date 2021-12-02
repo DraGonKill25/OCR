@@ -57,6 +57,6 @@ int soft_max(struct Neural_Network* net);
 int PosGoal(double *goal);
 void PrintState(struct Neural_Network *net);
 
-
+char RetrieveChar(int val);
 
 # endif

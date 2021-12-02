@@ -136,22 +136,27 @@ void create_matrix_file(SDL_Surface *img, char *filename)
 }
 
 
-double *goalArray(int digit)
+double *goalArray(char digit)
 {
   double *goal = calloc(10, sizeof(double));
-    goal[digit] = 1;
+  if(digit >= '0' && digit <= '9')
+  {
+      goal[(int)digit - 48] = 1;
+  }
   return goal;
 }
 
 //Create & return all the goals matrixes (for all letters)
+
+
 double **goalMatrix()
 {
-  double **goalMatrix = malloc(sizeof(double*) * 10);
-  int digit = 0;
-  for(int i = 0; i < 10; i++)
+  double **goalMatrix = malloc(sizeof(double*) * 9);
+  char dig = '0';
+  for(int i = 0; i < 9; i++)
   {
-      goalMatrix[i] = goalArray(digit);
-      digit++;
+      goalMatrix[i] = goalArray(dig);
+      dig++;
   }
   return goalMatrix;
 }
@@ -175,28 +180,28 @@ double *matrixFromFile(char *filename)
     }
   }
   fclose(file);
-  //printf("%s\n", *matrix);
   return matrix;
 }
 
 double **digitsMatrix()
 {
     //Variables
-    char digit_path[50] = "0.txt\0";
-    double **digitMatrix = malloc(sizeof(double *) * 10);
-    char digit = '0';
+    char digit_path[15] = "digits/1/1.txt\0";
+    double **digitsMatrix = malloc(sizeof(double *) * 9);
+    char digit = '1';
 
-    for(int i = 0; i < 10; i++)
+    for(int i = 0; i < 9; i++)
     {
         //printf("%c\n", digit);
-        digit_path[0] = digit;
+        digit_path[7] = digit;
+        digit_path[9] = digit;
         //printf("%s\n",digit_path);
-        digitMatrix[i] = matrixFromFile(digit_path);
+        digitsMatrix[i] = matrixFromFile(digit_path);
         digit++;
 
 
     }
-    return digitMatrix;
+    return digitsMatrix;
 }
 SDL_Surface* resizenumber(SDL_Surface *img);
 
@@ -217,9 +222,15 @@ double *create_matrix(SDL_Surface *img)
           Uint32 pixel = get_pixel(imgnew, j, i);
           SDL_GetRGB(pixel, imgnew -> format, &r, &g, &b);
           if(r == 0 && g == 0 && b == 0)
+          {
               digitMatrix[j + i * imgnew -> w] = 1;
+              //printf("%f", digitMatrix[j + i * imgnew->w]);
+          }
           else
+          {
               digitMatrix[j + i * imgnew -> w] = 0;
+              //printf("%f", digitMatrix[j + i * imgnew->w]);
+          }
       }
   }
   return digitMatrix;

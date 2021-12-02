@@ -10,9 +10,9 @@ struct Neural_Network* InitializeNetwork()
   struct Neural_Network *net = NULL;
   net = malloc(sizeof(struct Neural_Network));
   net -> nbInput = 28*28;
-  net -> nbHidden = 2;
-  net -> nbOutput = 10;
-  net -> ErrorRate = 0.1;
+  net -> nbHidden = 20;
+  net -> nbOutput = 9;
+  net -> ErrorRate = 0.0;
   net -> MaxErrorRate = 0.0;
   net -> eta = 0.5;
   net -> alpha = 0.9;
@@ -180,8 +180,8 @@ static void UpdateBiases(struct Neural_Network *net)
 //training
 void Neural_Network_OCR(struct Neural_Network *net, double *input, double *goal)
 {
-  //Initialise Goals & InputValues for this char
-  for (int g = 0; g < 11; g++)
+  //Initialise Goals & InputValues for this digit
+  for (int g = 0; g < 9; g++)
   {
     net -> Goal[g] = goal[g];
   }

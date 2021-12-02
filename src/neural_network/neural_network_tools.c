@@ -87,6 +87,7 @@ void SaveData(struct Neural_Network *net)
   fclose(biasO);
 }
 
+
 //Extract data previously saved in 4 files:
 //WeightIH - WeightHO - BiasH - BiasO
 struct Neural_Network* ExtractData()
@@ -95,9 +96,7 @@ struct Neural_Network* ExtractData()
   struct Neural_Network *net = malloc(sizeof(struct Neural_Network));
   net -> nbInput = 28*28; //size of imgs
   net -> nbHidden = 20;
-  net -> nbOutput = 52; //26*2 letters
-  net -> str = malloc(sizeof(char)*1200);
-  net -> str = "\0";
+  net -> nbOutput = 9; //10 digits
 
   int sizeMax = 15;
   char *line = calloc(15, sizeof(char));
@@ -205,12 +204,72 @@ int RetrievePos(struct Neural_Network *net)
 
 int PosGoal(double *goal)
 {
+  //printf("toto\n");
   int count = 0;
 
   while(goal[count] != 1.0)
     count++;
 
   return count;
+}
+
+//Retrive char from value val
+char RetrieveChar(int val)
+{
+  char c;
+
+  if(val <= 25)
+  {
+    c = val + 65;
+  }
+  else if(val > 25 && val <= 51)
+  {
+    c = (val + 97 - 26);
+  }
+  else if(val > 51 && val <= 61)
+  {
+    c = val + 48 - 52;
+  }
+  else
+  {
+    switch(val)
+    {
+      case 62:
+        c = ';';
+        break;
+      case 63:
+        c = '\'';
+        break;
+      case 64:
+        c = ':';
+        break;
+      case 65:
+        c = '-';
+        break;
+      case 66:
+        c = '.';
+        break;
+      case 67:
+        c = '!';
+        break;
+      case 68:
+        c = '?';
+        break;
+      case 69:
+        c = '(';
+        break;
+      case 70:
+        c = '\"';
+        break;
+      case 71:
+        c = ')';
+        break;
+      default:
+        exit(1);
+        break;
+    }
+  }
+  return c;
 }
 
 void PrintState(struct Neural_Network *net)
@@ -220,8 +279,8 @@ void PrintState(struct Neural_Network *net)
   int output = RetrievePos(net);
 
   //Retrive the chars : wanted & found
-  char goalDigit = PosGoal(net -> Goal);
-  int recognizedDigit = output;
+  char goalDigit = RetrieveChar(PosGoal(net -> Goal));
+  char recognizedDigit = RetrieveChar(output);
 
   if(net -> ErrorRate > net -> MaxErrorRate)
     net -> MaxErrorRate = net -> ErrorRate;
@@ -241,7 +300,4 @@ void PrintState(struct Neural_Network *net)
                                                     recognizedDigit,
                                                     net -> ErrorRate);
 }
-
-
-
 

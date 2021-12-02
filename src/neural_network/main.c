@@ -11,25 +11,13 @@
 #define KWHT  "\x1B[37m"
 
 
-/*double goal[10][10] = {
-    {1,0,0,0,0,0,0,0,0,0},//0 // Blank
-    {0,1,0,0,0,0,0,0,0,0},//1
-    {0,0,1,0,0,0,0,0,0,0},//2
-    {0,0,0,1,0,0,0,0,0,0},//3
-    {0,0,0,0,1,0,0,0,0,0},//4
-    {0,0,0,0,0,1,0,0,0,0},//5
-    {0,0,0,0,0,0,1,0,0,0},//6
-    {0,0,0,0,0,0,0,1,0,0},//7
-    {0,0,0,0,0,0,0,0,1,0},//8
-    {0,0,0,0,0,0,0,0,0,1}//9
-};*/
 
 
 int trainNN()
 {
     //Variables
     int nbEpoch = 5000;
-    int nbDigits = 10;
+    int nbDigits = 9;
     int currentDigit = 0;
     //int count = 0;
     srand(time(NULL));
@@ -40,6 +28,38 @@ int trainNN()
     //Initialize all goals & letters
     double **digits = digitsMatrix();
     double **goal = goalMatrix();
+
+    /*for (int i = 0; i < 10; i++)
+    {
+        printf("\n ");
+        for (int j = 0; j< 784;j++)
+        {
+            if (j % 28 == 0)printf("\n");
+            if (digits[i][j] == 1.0)
+            {
+                printf("%s",KRED);
+                printf("1 ");
+            }
+            else
+            {
+                printf("%s",KWHT);
+                printf("0 ");
+            }
+        }
+    }
+    printf("\n");
+
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("\n ");
+        for (int j = 0; j< 10;j++)
+        {
+            printf("%f ", goal[i][j]);
+        }
+    }
+    printf("\n");
+    */
 
     for (int epoch = 0; epoch < nbEpoch; epoch++)
     {
