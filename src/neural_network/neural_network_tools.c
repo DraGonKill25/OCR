@@ -6,6 +6,7 @@
 #include "SDL/SDL_image.h"
 #include <err.h>
 #include "neural_network.h"
+#include "sdl_tools.c"
 
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -152,7 +153,7 @@ struct Neural_Network* ExtractData()
 
 
 //softmax to determine the output layer
-int soft_max(struct Neural_Network* net)
+/*int soft_max(struct Neural_Network* net)
 {
     double tablo[10];
     double denominator = 0.0;
@@ -184,7 +185,7 @@ int soft_max(struct Neural_Network* net)
     }
     
     return j;
-}
+}*/
 
 int RetrievePos(struct Neural_Network *net)
 {
@@ -215,36 +216,36 @@ int PosGoal(double *goal)
 
 void PrintState(struct Neural_Network *net)
 {
-  //Squared error function
-  SquaredError(net);
-  int output = RetrievePos(net) + 1;
+    //Squared error function
+    SquaredError(net);
+    int output = RetrievePos(net) + 1;
 
-  //Retrive the chars : wanted & found
-  char goalDigit = PosGoal(net -> Goal) + 1;
-  char recognizedDigit = output;
+    //Retrive the chars : wanted & found
+    char goalDigit = PosGoal(net -> Goal) + 1;
+    char recognizedDigit = output;
 
-  if(net -> ErrorRate > net -> MaxErrorRate)
-    net -> MaxErrorRate = net -> ErrorRate;
+    if(net -> ErrorRate > net -> MaxErrorRate)
+        net -> MaxErrorRate = net -> ErrorRate;
 
-  //Print the progress
-  if(output == PosGoal(net -> Goal) + 1)
-    printf("Position Found = %d Expected %d %sOK \n",
-                    output, PosGoal(net -> Goal)+1,KGRN);
-  else
-    printf("Position Found = %d Expected %d %sKO \n",
-                    output, PosGoal(net -> Goal)+1,KRED);
+    //Print the progress
+    if(output == PosGoal(net -> Goal) + 1)
+        printf("Position Found = %d Expected %d %sOK \n",
+                output, PosGoal(net -> Goal)+1,KGRN);
+    else
+        printf("Position Found = %d Expected %d %sKO \n",
+                output, PosGoal(net -> Goal)+1,KRED);
 
-  printf("%s",KWHT);
+    printf("%s",KWHT);
 
-  printf("Char entered: %d | Char recoginized: %d | ErrorRate: %f\n",
-                                                    goalDigit,
-                                                    recognizedDigit,
-                                                    net -> ErrorRate);
+    printf("Char entered: %d | Char recoginized: %d | ErrorRate: %f\n",
+            goalDigit,
+            recognizedDigit,
+            net -> ErrorRate);
 }
 
 static void ForwardPass(struct Neural_Network *net)
 {
-  double sum, weight, output, bias;
+    double sum, weight, output, bias;
 
   //Calculate Output for Hidden neurons
   for (int h = 0; h < net -> nbHidden; h++)
@@ -324,4 +325,41 @@ char DetectText(struct Neural_Network *net, double* letter)
     return c;
 }
 
+
+int image_a_traiter(SDL_Surface* image)
+{
+    int moyenne = 0;
+    for (int i = 0; i < 28; i++)
+    {
+        for(int j = 0; j < 28; j++)
+        {
+            moyenne += get_pixel(image, i, j);
+        }
+    }
+    if (moyenne == 0)
+    {
+        return 0;
+    }
+
+
+    return 1;
+}
+
+char* Convert(struct Neural_Network* net, SDL_Surface* tablo[])
+{
+    char toto[81];
+    for (int i = 0; i < 81; i++)
+    {
+        if (image_a_traiter(tablo[i]) == 1)
+        {
+            double* letter = create_matrix(tablo[i]);
+            char res = DetectText(net, letter);
+            toto[i] = res;
+        }
+        else
+        {
+            toto[i] = '.';
+        }
+    }
+}
 
