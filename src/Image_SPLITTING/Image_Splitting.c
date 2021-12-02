@@ -74,7 +74,6 @@ void wait_for_keypressed()
 
 
 
-
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
 {
     int bpp = surf->format->BytesPerPixel;
@@ -105,9 +104,6 @@ Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
 
     return 0;
 }
-
-
-
 
 
 void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
@@ -166,7 +162,7 @@ Uint32 BlackorWhite(Uint32 Pixel,SDL_PixelFormat *Format)
 
 
 
-
+/*
 // check if there is a Sudoku grid in the x and y position, 
 // we return 0 if the position x and y is not the first of a sudoku grid 
 // we return 1 if the position x and y is the first position of a sudoku grid
@@ -179,7 +175,9 @@ int differenceLX(SDL_Surface *image,int x1,int y,int w){
     }
     return newx - x1;
 }
+*/
 
+/*
 
 int differenceLY(SDL_Surface *image,int x,int y1,int h){
     SDL_PixelFormat *Format = image->format;
@@ -190,38 +188,30 @@ int differenceLY(SDL_Surface *image,int x,int y1,int h){
     return newy - y1;
 }
 
+*/
 
+
+//Research the longueur L in the axe x
 int research_LX(SDL_Surface *image,int x,int y,int w){
     SDL_PixelFormat *Format = image->format;
     int x1 = x+1;
-    int compteur = 0;
-    while(compteur < 3){
-        while ( x1  < w && BlackorWhite(get_pixel(image,x1,y),Format) == 0 ){ // search the lenght of longueur in X{
-            x1++;
-        }
-        compteur += 1;
+    while ( x1  < w && BlackorWhite(get_pixel(image,x1,y),Format) == 0 ){ // search the lenght of longueur in X{
+        x1++;
     }
     int L = x1 - x;
     return L;
-
-
 }
+
+//Research the longueur in the axe y
 int research_LY(SDL_Surface *image, int x,int y,int h)
 {
     SDL_PixelFormat *Format = image->format;
     int y1 = y+1;
-    int compteur = 0;
-    while(compteur < 3){
-        while ( y1  < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0 ){ // search the lenght of longueur Y{
-            y1++;
-        }
-        //if (differenceLY(image,x,y1,h) > 15)
-           // return 0;
-        compteur += 1;
+    while ( y1  < h && BlackorWhite(get_pixel(image,x,y1),Format) == 0 ){ // search the lenght of longueur Y{
+        y1++;
     }
     int L = y1 - y;
     return L;
-
 }
 
 
@@ -246,6 +236,7 @@ int Good_research(SDL_Surface *image,int x,int y){
     }
 }
 
+/*
 int oldGood_research(SDL_Surface *image,int x,int y){
 
     SDL_PixelFormat *Format = image->format;
@@ -322,8 +313,9 @@ int oldGood_research(SDL_Surface *image,int x,int y){
         return 0;
     }
 }
+*/
 
-
+/*
 SDL_Surface* ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
 {
     Uint8 r,g,b;
@@ -342,20 +334,20 @@ SDL_Surface* ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
     return result;
 }
 
+*/
 
 
 
-
-
+/*
 void save_cellsGrille(SDL_Surface* img,int x,int y, int l){
     int xf = x + l * 9;
     int yf = y + l * 9;
     img = ZoomGrille(img, x, xf, l * 9, y, yf);
 }
+*/
 
 
-
-
+/*
 void search_grille(SDL_Surface *image)
 {
     int x= 0;
@@ -380,23 +372,19 @@ void search_grille(SDL_Surface *image)
     }
     int l = *longueur;
     save_cellsGrille(image,x1,y1,l);
-
-
-
-
 }
+*/
 
 
 
-
-SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int x3, int y1, int y4)//, int j, int i)
+SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
 {
     Uint8 r,g,b;
     Uint32 pixel;
-    SDL_Surface* result = SDL_CreateRGBSurface(0,abs(x2-x3),abs(y1-y4),32,0,0,0,0);
-    for(int y = 0; y < abs(y1-y4); y++)
+    SDL_Surface* result = SDL_CreateRGBSurface(0,abs(x2-l),abs(y1-y2),32,0,0,0,0);
+    for(int y = 0; y < abs(y1-y2); y++)
     {
-        for(int x = 0; x < abs(x2-x3); x++)
+        for(int x = 0; x < abs(x2-l); x++)
         {
             pixel = get_pixel(img,x+x1,y+y1);
             SDL_GetRGB(pixel,img -> format, &r,&g,&b);
@@ -406,11 +394,6 @@ SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int x3, int y1, int y4)//, in
     }
     return result;
 }
-
-
-
-
-
 
 void save_cells(SDL_Surface* img){
     int w = img -> w;
@@ -458,25 +441,18 @@ int main(int argc, char* argv[])
             y++;
         }
         x++;
-    
     }
     int l = research_LX(image_surface,x,y,height);
     if (l < width / 3)
         l *= 3;
     else if ( l < width / 9)
         l *= 9;
-    printf("%d + %d\n",res,l);
+    printf("%d\n",l);
     printf("x=%d and y=%d\n",x,y);
-    //search_grille(image_surface);
-    
     image_surface = Zoom(image_surface, x,x + l, l, y,y + l);
     save_cells(image_surface);
     wait_for_keypressed();
     SDL_FreeSurface(image_surface);
-
-
-
-
 
     return 0;
 }

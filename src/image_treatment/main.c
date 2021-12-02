@@ -115,7 +115,7 @@ int main( int argc, char* args[] )
                 
 
                 //To black
-                colorTreatment(Loaded, 30);
+                colorTreatment2(Loaded, 30);
                 SDL_SaveBMP(Loaded, "ToBlack.bmp");
                 SDL_BlitSurface(Loaded, NULL, screenSurface, NULL);
                 SDL_Flip(screenSurface);
