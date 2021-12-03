@@ -1,4 +1,5 @@
 #include "image_treatment.h"
+#include "Image_Splitting.h"
 #include <SDL/SDL_rotozoom.h>
 #include <gtk/gtk.h>
 
@@ -11,6 +12,7 @@ GtkWidget *FileChooser;
 GtkBuilder *Builder;
 char* filename;
 SDL_Surface * Loaded = NULL;
+int* longueur;
 
 
 gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data);
@@ -105,7 +107,7 @@ void clockwise(GtkButton *button, gpointer data)
     {
         GdkPixbuf *pixbuf;
 
-        Loaded = rotozoomSurface(Loaded, -90, 1, 1);
+        Loaded = rotozoomSurface(Loaded, 90, 1, 1);
 
         SDL_SaveBMP(Loaded, "rotated.bmp");
 
@@ -127,7 +129,7 @@ void cclockwise(GtkButton *button, gpointer data)
     {
         GdkPixbuf *pixbuf;
 
-        Loaded = rotozoomSurface(Loaded, 90, 1, 1);
+        Loaded = rotozoomSurface(Loaded, -90, 1, 1);
 
         SDL_SaveBMP(Loaded, "rotated.bmp");
 
@@ -221,7 +223,36 @@ int main_treat()
             Loaded = rotozoomSurface(Loaded, angle, 1, 1);
 
 
-            SDL_SaveBMP(Loaded, "Splitting.bmp");
+            SDL_SaveBMP(Loaded, "Rotated.bmp");
+
+            SDL_Surface *image_surface = Loaded;
+            int x = 0;
+            int y = 0;
+            int width = image_surface->w;
+            int res = 0;
+            int height = image_surface->h;
+            while(x < width && res == 0){
+                y = 0;
+                while( y < height && res == 0){
+                    res = Good_research(image_surface,x,y);
+                    y++;
+                }
+                x++;
+            }
+            int l = research_LX(image_surface,x,y,height);
+            if (l < width / 3)
+                l *= 3;
+            else if ( l < width / 9)
+                l *= 9;
+
+            printf("%d\n",l);
+            printf("x=%d and y=%d\n",x,y);
+            SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
+
+            result = save_cellsGrille(image_surface,x,y, l);
+            
+
+            save_cells(result);
 
             /*
             //Gamma

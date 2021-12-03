@@ -4,8 +4,6 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <stdlib.h>
-#include "image_treatment.h"
-
 
 int *longueur;
 
@@ -56,6 +54,95 @@ SDL_Surface* display_image(SDL_Surface *img)
     // return the screen for further uses
     return screen;
 }
+
+void wait_for_keypressed()
+{
+    SDL_Event event;
+
+    // Wait for a key to be down.
+    do
+    {
+        SDL_PollEvent(&event);
+    } while(event.type != SDL_KEYDOWN);
+
+    // Wait for a key to be up.
+    do
+    {
+        SDL_PollEvent(&event);
+    } while(event.type != SDL_KEYUP);
+}
+
+
+
+Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
+{
+    int bpp = surf->format->BytesPerPixel;
+    return (Uint8*)surf->pixels + y * surf->pitch + x * bpp;
+}
+
+Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
+{
+    Uint8 *p = pixel_ref(surface, x, y);
+
+    switch (surface->format->BytesPerPixel)
+    {
+        case 1:
+            return *p;
+
+        case 2:
+            return *(Uint16 *)p;
+
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return p[0] << 16 | p[1] << 8 | p[2];
+            else
+                return p[0] | p[1] << 8 | p[2] << 16;
+
+        case 4:
+            return *(Uint32 *)p;
+    }
+
+    return 0;
+}
+
+
+void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
+{
+    Uint8 *p = pixel_ref(surface, x, y);
+
+    switch(surface->format->BytesPerPixel)
+    {
+        case 1:
+            *p = pixel;
+            break;
+
+        case 2:
+            *(Uint16 *)p = pixel;
+            break;
+
+        case 3:
+            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            {
+                p[0] = (pixel >> 16) & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = pixel & 0xff;
+            }
+            else
+            {
+                p[0] = pixel & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = (pixel >> 16) & 0xff;
+            }
+            break;
+
+        case 4:
+            *(Uint32 *)p = pixel;
+            break;
+    }
+}
+
+
+
 
 
 // return 1 if the Pixel of the image is white
@@ -234,9 +321,9 @@ SDL_Surface *ZoomGrille(SDL_Surface *img, int x1,int x2, int l, int y1, int y2)
     Uint8 r,g,b;
     Uint32 pixel;
     SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
-    for(int y = 0; y < y2 - y1; y++)
+    for(int y = 0; y < y2; y++)
     {
-        for(int x = 0; x < x2 - x1; x++)
+        for(int x = 0; x < x2; x++)
         {
             pixel = get_pixel(img,x+x1,y+y1);
             SDL_GetRGB(pixel,img -> format, &r,&g,&b);
@@ -310,7 +397,7 @@ SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int x3, int y1, int y4)//, in
 }
 
 
-SDL_Surface* Resizenumber(SDL_Surface *img)
+SDL_Surface* resizenumber(SDL_Surface *img)
 {
   SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
                         28,
@@ -334,12 +421,58 @@ void save_cells(SDL_Surface* img){
             int x1 = x*step_w;
             int x2 = (x+1)*step_w;
             SDL_Surface* cell = Zoom(img, x1, x2, x1, y*step_h, (y+1)*step_h);//, y, x);
-            cell = (Resizenumber(cell));
+            cell = (resizenumber(cell));
             char name[50];
             snprintf(name, 50, "image_segmentation/square_%d%d.bmp", y, x);
             display_image(cell);
             SDL_SaveBMP(cell,name);
         }
     }
+}
+
+
+
+int main(int argc, char* argv[])
+{
+    if (argc != 2)
+    {
+        errx(1, "Number of argument exceed or is less than 2");
+    }
+
+    SDL_Surface* image_surface;
+    init_sdl();
+
+    image_surface = load_image(argv[1]);
+    int x = 0;
+    int y = 0;
+    int width = image_surface->w;
+    int res = 0;
+    int height = image_surface->h;
+    while(x < width && res == 0){
+        y = 0;
+        while( y < height && res == 0){
+            res = Good_research(image_surface,x,y);
+            y++;
+        }
+        x++;
+    }
+    int l = research_LX(image_surface,x,y,height);
+    if (l < width / 3)
+        l *= 3;
+    else if ( l < width / 9)
+        l *= 9;
+
+    printf("%d\n",l);
+    printf("x=%d and y=%d\n",x,y);
+    SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
+
+    result = save_cellsGrille(image_surface,x,y, l);
+
+
+    save_cells(result);
+    wait_for_keypressed();
+    SDL_FreeSurface(image_surface);
+
+    return 0;
 }
 
