@@ -6,7 +6,6 @@
 #include "SDL/SDL_image.h"
 #include <err.h>
 #include "neural_network.h"
-#include "sdl_tools.c"
 
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -328,12 +327,16 @@ char DetectText(struct Neural_Network *net, double* letter)
 
 int image_a_traiter(SDL_Surface* image)
 {
+    SDL_Surface *img = image;
+    Uint8 r, g, b;
     int moyenne = 0;
-    for (int i = 0; i < 28; i++)
+    for (int i = 0; i < img->h; i++)
     {
-        for(int j = 0; j < 28; j++)
+        for(int j = 0; j < img->w; j++)
         {
-            moyenne += get_pixel(image, i, j);
+            Uint32 pix = get_pixel(image, j, i);
+            SDL_GetRGB(pix, img->format, &r, &g, &b);
+            moyenne += r + g + b;
         }
     }
     if (moyenne == 0)
@@ -345,21 +348,22 @@ int image_a_traiter(SDL_Surface* image)
     return 1;
 }
 
-char* Convert(struct Neural_Network* net, SDL_Surface* tablo[])
+FILE* Convert(struct Neural_Network* net, SDL_Surface* tablo[])
 {
-    char toto[81];
+    FILE* converted = fopen("result.txt", "w");
     for (int i = 0; i < 81; i++)
     {
         if (image_a_traiter(tablo[i]) == 1)
         {
             double* letter = create_matrix(tablo[i]);
             char res = DetectText(net, letter);
-            toto[i] = res;
+            fprintf(converted, "%c", res);
         }
         else
         {
-            toto[i] = '.';
+            fprintf(converted, "%c", '.');
         }
     }
+    fclose(converted);
 }
 

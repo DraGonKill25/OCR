@@ -103,8 +103,33 @@ int trainNN()
 }
 
 
-int main()
+//traitement bla bla bla qui renvoie un tablo[81] SDL_Surface des 81 cases
+//
+
+int main(int argc, char *argv[])
 {
-    trainNN();
-    return 0;
+    struct Neural_Network *net = ExtractData();
+    //Argument gesture
+    if(argc>1)
+    {
+        if(strcmp(argv[1], "-Train") == 0)
+        {
+            trainNN();
+        }
+        if(strcmp(argv[1], "-Resolve") == 0)
+        {
+            //Give a sudoku grid
+            if(strcmp(argv[2], "") != 0)
+            {
+                Convert(net, tablo);//tablo des 81 images;
+            }
+        }
+    }
+    else
+    {
+        errx(1, "Wrong argument !");
+    }
+    return(EXIT_SUCCESS);
 }
+
+

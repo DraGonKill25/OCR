@@ -59,6 +59,6 @@ void PrintState(struct Neural_Network *net);
 
 char RetrieveChar(int val);
 char DetectText(struct Neural_Network *net, double* letter);
-char DetectText(struct Neural_Network *net, double* letter);
+FILE* Convert(struct Neural_Network *net, SDL_Surface* tablo[]);
 
 # endif
