@@ -186,15 +186,15 @@ double *matrixFromFile(char *filename)
 double **digitsMatrix()
 {
     //Variables
-    char digit_path[15] = "digits/1/1.txt\0";
+    char digit_path[14] = "dagit/1/1.txt\0";
     double **digitsMatrix = malloc(sizeof(double *) * 9);
     char digit = '1';
 
     for(int i = 0; i < 9; i++)
     {
         //printf("%c\n", digit);
-        digit_path[7] = digit;
-        digit_path[9] = digit;
+        digit_path[6] = digit;
+        digit_path[8] = digit;
         //printf("%s\n",digit_path);
         digitsMatrix[i] = matrixFromFile(digit_path);
         digit++;
@@ -217,8 +217,10 @@ double *create_matrix(SDL_Surface *img)
 
   for(int i = 0; i < imgnew -> h; i++)
   {
-      for(int j = 0; j < imgnew -> w; j++)
+      digitMatrix[0 + i * imgnew ->w] = 0;
+      for(int j = 1; j < imgnew -> w - 1; j++)
       {
+          digitMatrix[j] = 0;
           Uint32 pixel = get_pixel(imgnew, j, i);
           SDL_GetRGB(pixel, imgnew -> format, &r, &g, &b);
           if(r == 0 && g == 0 && b == 0)

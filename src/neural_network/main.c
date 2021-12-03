@@ -15,6 +15,7 @@
 
 int trainNN()
 {
+    printf("test\n");
     //Variables
     int nbEpoch = 5000;
     int nbDigits = 9;
@@ -90,7 +91,7 @@ int trainNN()
             }
             printf("%s",KWHT);
         }
-        if(net->MaxErrorRate<0.0005 && net->MaxErrorRate != 0.0)
+        if(net->MaxErrorRate<0.0001 && net->MaxErrorRate != 0.0)
         {
             break;
         }
@@ -106,30 +107,34 @@ int trainNN()
 //traitement bla bla bla qui renvoie un tablo[81] SDL_Surface des 81 cases
 //
 
-int main(int argc, char *argv[])
+char OCR(struct Neural_Network* net, SDL_Surface* img)
 {
-    struct Neural_Network *net = ExtractData();
-    //Argument gesture
-    if(argc>1)
+        return Convert(net, img);
+}
+
+
+int main(int argc, char* argv[])
+{
+    if (argc != 2)
     {
-        if(strcmp(argv[1], "-Train") == 0)
-        {
-            trainNN();
-        }
-        if(strcmp(argv[1], "-Resolve") == 0)
-        {
-            //Give a sudoku grid
-            if(strcmp(argv[2], "") != 0)
-            {
-                Convert(net, tablo);//tablo des 81 images;
-            }
-        }
+        errx(1, "erreur argument");
+    }
+    init_sdl();
+    
+    printf("toto\n");
+    if (strcmp(argv[1], "1") == 0)
+    {
+        trainNN();
     }
     else
     {
-        errx(1, "Wrong argument !");
-    }
-    return(EXIT_SUCCESS);
-}
+        struct Neural_Network *net = ExtractData();
+        SDL_Surface* img = NULL;
+        img = IMG_Load(argv[1]);
 
+        char toto = OCR(net, img);
+        printf("%c\n", toto);
+    }
+    return 0;
+}
 

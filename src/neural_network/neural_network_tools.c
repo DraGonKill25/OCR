@@ -339,31 +339,26 @@ int image_a_traiter(SDL_Surface* image)
             moyenne += r + g + b;
         }
     }
-    if (moyenne == 0)
+    /*if (moyenne > (250*784))
     {
         return 0;
-    }
+    }*/
 
 
     return 1;
 }
 
-FILE* Convert(struct Neural_Network* net, SDL_Surface* tablo[])
+char Convert(struct Neural_Network* net, SDL_Surface* img)
 {
-    FILE* converted = fopen("result.txt", "w");
-    for (int i = 0; i < 81; i++)
+    char res;
+    if (image_a_traiter(img) == 1)
     {
-        if (image_a_traiter(tablo[i]) == 1)
-        {
-            double* letter = create_matrix(tablo[i]);
-            char res = DetectText(net, letter);
-            fprintf(converted, "%c", res);
-        }
-        else
-        {
-            fprintf(converted, "%c", '.');
-        }
+        double* letter = create_matrix(img);
+        res = DetectText(net, letter);
     }
-    fclose(converted);
+    else
+    {
+        res = '.';
+    }
+    return res;
 }
-
