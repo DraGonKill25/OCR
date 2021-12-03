@@ -397,6 +397,17 @@ SDL_Surface* Zoom(SDL_Surface *img, int x1,int x2, int x3, int y1, int y4)//, in
 }
 
 
+SDL_Surface* resizenumber(SDL_Surface *img)
+{
+  SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
+                        28,
+                        28,
+                        img->format->BitsPerPixel,0,0,0,0);
+  SDL_SoftStretch(img, NULL, dest, NULL);
+  //SDL_BlitScaled(img, NULL, dest, NULL);
+  return dest;
+}
+
 
 void save_cells(SDL_Surface* img){
     int w = img -> w;
@@ -410,7 +421,7 @@ void save_cells(SDL_Surface* img){
             int x1 = x*step_w;
             int x2 = (x+1)*step_w;
             SDL_Surface* cell = Zoom(img, x1, x2, x1, y*step_h, (y+1)*step_h);//, y, x);
-
+            cell = (resizenumber(cell));
             char name[50];
             snprintf(name, 50, "image_segmentation/square_%d%d.bmp", y, x);
             display_image(cell);

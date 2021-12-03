@@ -20,4 +20,4 @@ ${EXEC}: ${OBJ}
 
 
 clean:
-	rm -f ${OBJ} ${DEP} ${EXEC} main
+	rm -f ${OBJ} ${DEP} ${EXEC}

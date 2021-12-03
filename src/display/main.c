@@ -106,8 +106,8 @@ int main()
 
     SDL_Surface *grid = NULL;
     grid = load_image("blank_grid.png");
-    SDL_Surface *num1 = load_image("digit_on_grid/1.png");
-    //SDL_Surface *num2 = load_image("digit_on_grid/2.png");
+    //SDL_Surface *num1 = load_image("digit_on_grid/1.png");
+    SDL_Surface *num2 = load_image("digit_on_grid/2.png");
     //SDL_Surface *num3 = load_image("digit_on_grid/3.png");
     //SDL_Surface *num4 = load_image("digit_on_grid/4.png");
     //SDL_Surface *num5 = load_image("digit_on_grid/5.png");
@@ -115,6 +115,7 @@ int main()
     //SDL_Surface *num7 = load_image("digit_on_grid/7.png");
     //SDL_Surface *num8 = load_image("digit_on_grid/8.png");
     //SDL_Surface *num9 = load_image("digit_on_grid/9.png");
+    /*
     SDL_Rect position;
     position.x = 22;
     position.y = 28;
@@ -125,7 +126,10 @@ int main()
     end.y = 80;
     end.w = 51;
     end.h = 51;
-    SDL_BlitSurface(num1, &end, grid, &position);
+    //SDL_BlitSurface(num1, &position, grid, &end);
+    position.x = 22+51;
+    end.x = 79+51;*/
+    SDL_BlitSurface(num2,NULL, grid , NULL);
     SDL_SaveBMP(grid, "grid_solve.bmp");
 
 
