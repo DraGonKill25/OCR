@@ -2,6 +2,7 @@
 #include "Image_Splitting.h"
 #include <SDL/SDL_rotozoom.h>
 #include <gtk/gtk.h>
+#include "main_nn.h"
 
 GtkWidget *window;
 GtkWidget *image;
@@ -17,6 +18,9 @@ char* filename;
 SDL_Surface * Loaded = NULL;
 int* longueur;
 
+
+void on_solve(GtkButton *button, gpointer data);
+void on_train(GtkButton *button, gpointer data);
 void on_crop(GtkButton *button, gpointer data);
 gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data);
 void on_MainButton_clicked(); 
@@ -97,12 +101,19 @@ void on_crop(GtkButton *button, gpointer data)
 
 void on_train(GtkButton *button, gpointer data)
 {
-
+    if(data == NULL)
+    {
+    }
+    GTK_WIDGET(button);
+    trainNN();
 }
 
 void on_solve(GtkButton *button, gpointer data)
 {
-
+    if(data==NULL)
+    {
+    }
+    GTK_WIDGET(button);
 }
 
 void on_MainButton_clicked(GtkButton *button, gpointer data)

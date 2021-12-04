@@ -97,7 +97,29 @@ void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
 }
 
 
+SDL_Surface* resizenumber(SDL_Surface *img)
+{
+  SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
+                        75,
+                        75,
+                        img->format->BitsPerPixel,0,0,0,0);
+  SDL_SoftStretch(img, NULL, dest, NULL);
+  //SDL_BlitScaled(img, NULL, dest, NULL);
+  return dest;
+}
 
+
+void print_grid(SDL_Surface* img, SDL_Surface* grid, int x, int y)
+{
+    for(int i=0; i<img->h; i++)
+    {
+        for(int j=0; j<img->w; j++)
+        {
+            Uint32 pixel= get_pixel(img, j, i);
+            put_pixel(grid, x+j, y+i, pixel);
+        }
+    }
+}
 
 
 int main()
@@ -105,7 +127,7 @@ int main()
     init_sdl();
 
     SDL_Surface *grid = NULL;
-    grid = load_image("blank_grid.png");
+    grid = SDL_CreateRGBSurface(0, (60*10), (60*10), 32, 0,0,0,0); //load_image("grid.jpg");
     //SDL_Surface *num1 = load_image("digit_on_grid/1.png");
     SDL_Surface *num2 = load_image("digit_on_grid/2.png");
     //SDL_Surface *num3 = load_image("digit_on_grid/3.png");
@@ -115,12 +137,13 @@ int main()
     //SDL_Surface *num7 = load_image("digit_on_grid/7.png");
     //SDL_Surface *num8 = load_image("digit_on_grid/8.png");
     //SDL_Surface *num9 = load_image("digit_on_grid/9.png");
-    /*
-    SDL_Rect position;
+    /*SDL_Rect position;
     position.x = 22;
-    position.y = 28;
+    position.y = 30;
     position.w = 51;
-    position.h = 51;
+    position.h = 51;*/
+    num2 = resizenumber(num2);
+    /*
     SDL_Rect end;
     end.x = 79;
     end.y = 80;
@@ -129,9 +152,23 @@ int main()
     //SDL_BlitSurface(num1, &position, grid, &end);
     position.x = 22+51;
     end.x = 79+51;*/
-    SDL_BlitSurface(num2,NULL, grid , NULL);
-    SDL_SaveBMP(grid, "grid_solve.bmp");
+    int x=6;
+    int y=6;
 
+
+    for(int i=0; i<9; i++)
+    {
+        x=9;
+        for(int j=0; j<9; j++)
+        {
+            print_grid(num2, grid, x, y);
+            printf("%d||%d\n", x,y);
+            x+=62;
+        }
+        y+=62;
+    }
+    //SDL_BlitSurface(num2, &position, grid , &position);
+    SDL_SaveBMP(grid, "grid_solve.bmp");
 
 
     return 0;

@@ -10,9 +10,9 @@
 #include <math.h>
 
 
-Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y);
-Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y);
-void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel);
+//Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y);
+//Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y);
+//void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel);
 void insertionSort(Uint8 arr[], int n);
 void grayscale(SDL_Surface* image_surface);
 void wait_for_keypressed();

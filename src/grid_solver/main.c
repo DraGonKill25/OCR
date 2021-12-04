@@ -13,6 +13,7 @@ int main(int argc,  char *argv[])
 
     char toto[9][9];//create a temp array of the char in the origin file
     int good_one[9][9];//array that will contain the grid
+    //int toprint[9][9];//array for print original number
     int i=0,j=0,c;
 
     FILE *file = NULL;
@@ -44,7 +45,17 @@ int main(int argc,  char *argv[])
     {
         for(int y=0; y<9; y++)
         {
-            good_one[x][y] = (change_dot(toto[x][y]));
+            int test = change_dot(toto[x][y]);
+            /*if(test==0)
+            {
+                toprint[x][y]=0;
+            }
+            else
+            {
+                toprint[x][y]=1;
+            }*/
+
+            good_one[x][y] = test;
         }
     }
 
@@ -55,6 +66,23 @@ int main(int argc,  char *argv[])
         write_file(argv[1],good_one);
     }
     else errx(1,"NO SOLUTION! The given grid is wrong please change it !");
+
+    /*
+    for(int t=0; t<9; t++)
+    {
+        for(int h=0; h<9; h++)
+        {
+            if(toprint[t][h]==1)
+            {
+                print_input(good_one[t][h]);
+            }
+            else
+            {
+                print_output(good_one[t][h]);
+            }
+        }
+    }*/
+
 
     return 0;
 }

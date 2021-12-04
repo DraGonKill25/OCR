@@ -1,21 +1,23 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
+#include "../Image_Splitting.h"
+#include "../image_treatment.h"
 #include <err.h>
-
+/*
 void init_sdl()
 {
     // Init only the video part.
     // If it fails, die with an error message.
     if(SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(1,"Could not initialize SDL: %s.\n", SDL_GetError());
-}
-
+}*/
+/*
 Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
 {
     int bpp = surf->format->BytesPerPixel;
     return (Uint8*)surf->pixels + y * surf->pitch + x * bpp;
-}
-
+}*/
+/*
 Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
 {
     Uint8 *p = pixel_ref(surface, x, y);
@@ -39,8 +41,8 @@ Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
     }
 
     return 0;
-}
-
+}*/
+/*
 SDL_Surface* load_image(char *path)
 {
     SDL_Surface *img;
@@ -54,8 +56,8 @@ SDL_Surface* load_image(char *path)
     }
 
     return img;
-}
-
+}*/
+/*
 SDL_Surface* display_image(SDL_Surface *img)
 {
     SDL_Surface *screen;
@@ -78,7 +80,7 @@ SDL_Surface* display_image(SDL_Surface *img)
 
     // return the screen for further uses
     return screen;
-}
+}*/
 
 void image_to_list(SDL_Surface* image_surface, int* input)
 {
@@ -238,7 +240,7 @@ double *create_matrix(SDL_Surface *img)
   return digitMatrix;
 }
 
-
+/*
 SDL_Surface* resizenumber(SDL_Surface *img)
 {
   SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
@@ -249,4 +251,4 @@ SDL_Surface* resizenumber(SDL_Surface *img)
   //SDL_BlitScaled(img, NULL, dest, NULL);
   return dest;
 }
-
+*/

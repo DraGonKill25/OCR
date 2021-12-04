@@ -25,10 +25,10 @@ int Grid_Check(int grid[9][9], int row, int col, int num)
     return 1;
 }
 
-int Solve_Sudoku(int g0rid[9][9], int row, int col)
+int Solve_Sudoku(int grid[9][9], int row, int col)
 {
 
-    if(row<9 && col<9)0{//check if we are still in the grid
+    if(row<9 && col<9){//check if we are still in the grid
 
         if(grid[row][col])
         {
@@ -138,6 +138,3 @@ void write_file(char *file_name, int grid[9][9])
 
     fclose(file);
 }
-
-
-
