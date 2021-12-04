@@ -188,16 +188,16 @@ double *matrixFromFile(char *filename)
 double **digitsMatrix()
 {
     //Variables
-    char digit_path[14] = "dagit/1/1.txt\0";
+    char digit_path[29] = "neural_network/dagit/1/1.txt\0";
     double **digitsMatrix = malloc(sizeof(double *) * 9);
     char digit = '1';
 
     for(int i = 0; i < 9; i++)
     {
         //printf("%c\n", digit);
-        digit_path[6] = digit;
-        digit_path[8] = digit;
-        //printf("%s\n",digit_path);
+        digit_path[21] = digit;
+        digit_path[23] = digit;
+        printf("%s\n",digit_path);
         digitsMatrix[i] = matrixFromFile(digit_path);
         digit++;
 
