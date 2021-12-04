@@ -17,24 +17,24 @@ struct Neural_Network
 
     //Arrays
     double OutputI[28*28];
-    double Goal[11];
+    double Goal[9];
     //Weight Arrays
     double WeightIH[28*28][20];
-    double WeightHO[20][11];
+    double WeightHO[20][9];
     //Bias Array
     double BiasH[20];
     //Bias output
-    double BiasO[11];
+    double BiasO[9];
     //Output Hidden
     double OutputH[20];
     //Output of output
-    double OutputO[11];
+    double OutputO[9];
 
     //delta weight
     double dWeightIH[28*28][20];
-    double dWeightHO[20][11];
+    double dWeightHO[20][9];
     //delta of output
-    double dOutputO[11];
+    double dOutputO[9];
     //delta of hidden
     double dHidden[20];
 
