@@ -28,7 +28,7 @@ int main_treat();
 int main(int argc, char *argv[])
 {
     gtk_init (&argc, &argv);
-    
+
     Builder = gtk_builder_new_from_file("GUI.glade");
 
     window = GTK_WIDGET(gtk_builder_get_object(Builder, "MyWindow"));
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     image = GTK_WIDGET(gtk_builder_get_object(Builder, "image"));
     GtkWidget *preview;
     preview = gtk_image_new();
-    
+
     gtk_file_chooser_set_preview_widget (GTK_FILE_CHOOSER(FileChooser), preview);
     g_signal_connect (FileChooser, "update-preview", G_CALLBACK (update_preview_cb), preview);
     g_signal_connect (ClockW, "clicked", G_CALLBACK(clockwise),image);
@@ -59,23 +59,23 @@ int main(int argc, char *argv[])
 
 void update_preview_cb (GtkFileChooser *file_chooser, gpointer data)
 {
-  GtkWidget *preview;
-  char *filename;
-  GdkPixbuf *pixbuf;
-  gboolean have_preview;
+    GtkWidget *preview;
+    char *filename;
+    GdkPixbuf *pixbuf;
+    gboolean have_preview;
 
-  preview = GTK_WIDGET (data);
-  filename = gtk_file_chooser_get_preview_filename (file_chooser);
+    preview = GTK_WIDGET (data);
+    filename = gtk_file_chooser_get_preview_filename (file_chooser);
 
-  pixbuf = gdk_pixbuf_new_from_file_at_size (filename, 128, 128, NULL);
-  have_preview = (pixbuf != NULL);
-  g_free (filename);
+    pixbuf = gdk_pixbuf_new_from_file_at_size (filename, 128, 128, NULL);
+    have_preview = (pixbuf != NULL);
+    g_free (filename);
 
-  gtk_image_set_from_pixbuf (GTK_IMAGE (preview), pixbuf);
-  if (pixbuf)
-    g_object_unref (pixbuf);
+    gtk_image_set_from_pixbuf (GTK_IMAGE (preview), pixbuf);
+    if (pixbuf)
+        g_object_unref (pixbuf);
 
-  gtk_file_chooser_set_preview_widget_active (file_chooser, have_preview);
+    gtk_file_chooser_set_preview_widget_active (file_chooser, have_preview);
 }
 
 void on_MainButton_clicked(GtkButton *button, gpointer data)
@@ -91,8 +91,8 @@ void on_MainButton_clicked(GtkButton *button, gpointer data)
         pixbuf = gdk_pixbuf_new_from_file_at_size("Splitting.bmp", 750,750,NULL);
         gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
 
-        Loaded = IMG_Load("Splitting.bmp");
-    
+        Loaded = IMG_Load("testHugo.bmp");
+
 
         if (pixbuf)
             g_object_unref(pixbuf);
@@ -113,7 +113,7 @@ void clockwise(GtkButton *button, gpointer data)
 
         pixbuf = gdk_pixbuf_new_from_file_at_size("rotated.bmp", 750,750,NULL);
         gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
-    
+
 
         if (pixbuf)
             g_object_unref(pixbuf);
@@ -141,7 +141,7 @@ void cclockwise(GtkButton *button, gpointer data)
             g_object_unref(pixbuf);
 
     }
-}
+}//SDL_CreateRGBSurface
 
 
 gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data)
@@ -204,7 +204,7 @@ int main_treat()
 
             //Median filter
             MedianFilter(Loaded);
-            
+
             //Sobel
             sobel_surface= SDL_CreateRGBSurface(0,Loaded->w, Loaded->h, 32, 0,0,0,0);
             SobelEdgeDetection(Loaded, sobel_surface, 0.02);
@@ -250,7 +250,7 @@ int main_treat()
             SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
 
             result = save_cellsGrille(image_surface,x,y, l);
-            
+
 
             save_cells(result);
 
@@ -270,7 +270,7 @@ int main_treat()
             wait_for_keypressed();*/
 
 
-            
+
         }
     }
     SDL_FreeSurface( Loaded );

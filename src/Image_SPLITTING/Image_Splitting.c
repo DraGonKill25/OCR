@@ -337,7 +337,7 @@ void save_cells(SDL_Surface* img){
             cell = (Resizenumber(cell));
             char name[50];
             snprintf(name, 50, "image_segmentation/square_%d%d.bmp", y, x);
-            display_image(cell);
+            //display_image(cell);
             SDL_SaveBMP(cell,name);
         }
     }
