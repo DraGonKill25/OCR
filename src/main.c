@@ -6,6 +6,9 @@
 GtkWidget *window;
 GtkWidget *image;
 GtkWidget *MainButton;
+GtkWidget *Treat;
+GtkWidget *Train;
+GtkWidget *Crop;
 GtkWidget *ClockW;
 GtkWidget *CClockW;
 GtkWidget *FileChooser;
@@ -14,7 +17,7 @@ char* filename;
 SDL_Surface * Loaded = NULL;
 int* longueur;
 
-
+void on_crop(GtkButton *button, gpointer data);
 gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data);
 void on_MainButton_clicked(); 
 void update_preview_cb (GtkFileChooser *file_chooser, gpointer data);
@@ -35,6 +38,9 @@ int main(int argc, char *argv[])
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
+    Treat = GTK_WIDGET(gtk_builder_get_object(Builder, "Treat"));
+    Crop = GTK_WIDGET(gtk_builder_get_object(Builder, "Crop"));
+    Train = GTK_WIDGET(gtk_builder_get_object(Builder, "Train"));
     MainButton = GTK_WIDGET(gtk_builder_get_object(Builder, "MainButton"));
     ClockW = GTK_WIDGET(gtk_builder_get_object(Builder, "ClockW"));
     CClockW = GTK_WIDGET(gtk_builder_get_object(Builder, "CClockW"));
@@ -48,7 +54,10 @@ int main(int argc, char *argv[])
     g_signal_connect (ClockW, "clicked", G_CALLBACK(clockwise),image);
     g_signal_connect (CClockW, "clicked", G_CALLBACK(cclockwise),image);
     g_signal_connect(FileChooser, "file-set", G_CALLBACK(on_FileChoosing_file_set), image);
-    g_signal_connect(MainButton, "clicked", G_CALLBACK(on_MainButton_clicked), image);
+    g_signal_connect(Treat, "clicked", G_CALLBACK(on_MainButton_clicked), image);
+    g_signal_connect(Crop, "clicked", G_CALLBACK(on_crop), NULL);
+    g_signal_connect(Train, "clicked", G_CALLBACK(on_train), NULL);
+    g_signal_connect(MainButton, "clicked", G_CALLBACK(on_solve), NULL);
 
     gtk_widget_show_all(window);
 
@@ -78,6 +87,24 @@ void update_preview_cb (GtkFileChooser *file_chooser, gpointer data)
     gtk_file_chooser_set_preview_widget_active (file_chooser, have_preview);
 }
 
+void on_crop(GtkButton *button, gpointer data)
+{
+    if (filename != NULL && button != NULL && data == NULL)
+    {
+        save_cells(Loaded);
+    }
+}
+
+void on_train(GtkButton *button, gpointer data)
+{
+
+}
+
+void on_solve(GtkButton *button, gpointer data)
+{
+
+}
+
 void on_MainButton_clicked(GtkButton *button, gpointer data)
 {
     GTK_WIDGET(button);
@@ -88,7 +115,7 @@ void on_MainButton_clicked(GtkButton *button, gpointer data)
         main_treat();
         // No file chosen wip
 
-        pixbuf = gdk_pixbuf_new_from_file_at_size("Splitting.bmp", 750,750,NULL);
+        pixbuf = gdk_pixbuf_new_from_file_at_size("testHugo.bmp", 750,750,NULL);
         gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
 
         Loaded = IMG_Load("testHugo.bmp");
@@ -247,12 +274,7 @@ int main_treat()
 
             printf("%d\n",l);
             printf("x=%d and y=%d\n",x,y);
-            SDL_Surface* result = SDL_CreateRGBSurface(0,l,l,32,0,0,0,0);
-
-            result = save_cellsGrille(image_surface,x,y, l);
-
-
-            save_cells(result);
+            save_cellsGrille(image_surface,x,y, l);
 
             /*
             //Gamma
