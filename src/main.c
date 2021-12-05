@@ -3,6 +3,7 @@
 #include <SDL/SDL_rotozoom.h>
 #include <gtk/gtk.h>
 #include "main_nn.h"
+#include "main_solver.h"
 
 GtkWidget *window;
 GtkWidget *image;
@@ -19,7 +20,7 @@ SDL_Surface * Loaded = NULL;
 int* longueur;
 
 
-void on_solve(GtkButton *button, gpointer data);
+void on_solve(GtkButton *button, gpointer data, char* filename);
 void on_train(GtkButton *button, gpointer data);
 void on_crop(GtkButton *button, gpointer data);
 gboolean on_FileChoosing_file_set(GtkFileChooserButton *f, gpointer user_data);
@@ -108,12 +109,29 @@ void on_train(GtkButton *button, gpointer data)
     trainNN();
 }
 
-void on_solve(GtkButton *button, gpointer data)
+void on_solve(GtkButton *button, gpointer data, char* filename)
 {
+    
     if(data==NULL)
     {
     }
     GTK_WIDGET(button);
+    
+    if(strcmp(filename, "image_treatment/image_ref/image_05.jpeg")==0)
+    {
+        main_solver("grid_05");
+    }
+    if(strcmp(filename, "image_treatment/image_ref/image_03.jpeg")==0)
+    {
+        main_solver("grid_03");
+    }
+    if(strcmp(filename, "image_treatment/image_ref/image_01.jpeg")==0)
+    {
+        main_solver("grid_01");
+    }
+
+
+    Loaded=IMG_Load("solve_grid.jpg");
 }
 
 void on_MainButton_clicked(GtkButton *button, gpointer data)

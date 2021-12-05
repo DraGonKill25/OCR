@@ -330,19 +330,19 @@ int image_a_traiter(SDL_Surface* image)
     SDL_Surface *img = image;
     Uint8 r, g, b;
     int moyenne = 0;
-    for (int i = 0; i < img->h; i++)
+    for (int i = 5; i < img->h-5; i++)
     {
-        for(int j = 0; j < img->w; j++)
+        for(int j = 5; j < img->w-5; j++)
         {
             Uint32 pix = get_pixel(image, j, i);
             SDL_GetRGB(pix, img->format, &r, &g, &b);
             moyenne += r + g + b;
         }
     }
-    /*if (moyenne > (250*784))
+    if (moyenne > (250*784))
     {
         return 0;
-    }*/
+    }
 
 
     return 1;

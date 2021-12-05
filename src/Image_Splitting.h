@@ -1,11 +1,11 @@
 #ifndef IMAGE_SPLITTING_H
 #define IMAGE_SPLITTING_H
 
-#include <stdio.h>                                                                                   
-#include <math.h>                                                               
-#include <err.h>                                                                
-#include <SDL/SDL.h>                                                            
-#include <SDL/SDL_image.h>                                                      
+#include <stdio.h>
+#include <math.h>
+#include <err.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 #include <stdlib.h>
 
 void init_sdl();

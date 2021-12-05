@@ -106,7 +106,7 @@ int trainNN()
 
 char OCR(struct Neural_Network* net, SDL_Surface* img)
 {
-        return Convert(net, img);
+    return Convert(net, img);
 }
 
 /*

@@ -1,4 +1,99 @@
 #include "solver.h"
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+
+
+/*
+void init_sdl()
+{
+    // Init only the video part.
+    // If it fails, die with an error message.
+    if(SDL_Init(SDL_INIT_VIDEO) == -1)
+        errx(1,"Could not initialize SDL: %s.\n", SDL_GetError());
+}
+
+
+SDL_Surface* load_image(char *path)
+{
+    SDL_Surface *img;
+
+    // Load an image using SDL_image with format detection.
+    // If it fails, die with an error message.
+    img = IMG_Load(path);
+    if (!img)
+        errx(3, "can't load %s: %s", path, IMG_GetError());
+
+    return img;
+}
+
+
+
+Uint8* pixel_ref(SDL_Surface *surf, unsigned x, unsigned y)
+{
+    int bpp = surf->format->BytesPerPixel;
+    return (Uint8*)surf->pixels + y * surf->pitch + x * bpp;
+}
+
+Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y)
+{
+    Uint8 *p = pixel_ref(surface, x, y);
+
+    switch (surface->format->BytesPerPixel)
+    {
+        case 1:
+            return *p;
+
+        case 2:
+            return *(Uint16 *)p;
+
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return p[0] << 16 | p[1] << 8 | p[2];
+            else
+                return p[0] | p[1] << 8 | p[2] << 16;
+
+        case 4:
+            return *(Uint32 *)p;
+    }
+
+    return 0;
+}
+
+void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
+{
+    Uint8 *p = pixel_ref(surface, x, y);
+
+    switch(surface->format->BytesPerPixel)
+    {
+        case 1:
+            *p = pixel;
+            break;
+
+        case 2:
+            *(Uint16 *)p = pixel;
+            break;
+
+        case 3:
+            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            {
+                p[0] = (pixel >> 16) & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = pixel & 0xff;
+            }
+            else
+            {
+                p[0] = pixel & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = (pixel >> 16) & 0xff;
+            }
+            break;
+
+        case 4:
+            *(Uint32 *)p = pixel;
+            break;
+    }
+}
+*/
 
 
 //all the function in this file are going to be use for solve the sudoku
@@ -138,3 +233,131 @@ void write_file(char *file_name, int grid[9][9])
 
     fclose(file);
 }
+
+/*
+SDL_Surface* resizenumber(SDL_Surface *img)
+{
+  SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
+                        60,
+                        60,
+                        img->format->BitsPerPixel,0,0,0,0);
+  SDL_SoftStretch(img, NULL, dest, NULL);
+  //SDL_BlitScaled(img, NULL, dest, NULL);
+  return dest;
+}*/
+
+
+void print_grid(SDL_Surface* img, SDL_Surface* grid, int x, int y)
+{
+    if(img ==NULL || grid == NULL || x==0 || y==0)
+        errx(1, "something is wrong i can fell it");
+
+    for(int i=0; i<img->h; i++)
+    {
+        for(int j=0; j<img->w; j++)
+        {
+            Uint32 pixel= get_pixel(img, j, i);
+            put_pixel(grid, x+j, y+i, pixel);
+        }
+    }
+}
+
+void solve_grid(SDL_Surface* img, int imgtochoose, int x, int y)
+{
+    init_sdl();
+    SDL_Surface* chiffre = NULL;
+
+    switch (imgtochoose)
+    {
+        case 1:
+            chiffre = load_image("solve_digit/1.png");
+            break;
+
+        case 2:
+            chiffre = load_image("solve_digit/2.png");
+            break;
+
+        case 3:
+            chiffre = load_image("solve_digit/3.png");
+            break;
+
+        case 4:
+            chiffre = load_image("solve_digit/4.png");
+            break;
+
+        case 5:
+            chiffre = load_image("solve_digit/5.png");
+            break;
+
+        case 6:
+            chiffre = load_image("solve_digit/6.png");
+            break;
+
+        case 7:
+            chiffre = load_image("solve_digit/7.png");
+            break;
+
+        case 8:
+            chiffre = load_image("solve_digit/8.png");
+            break;
+
+        case 9:
+            chiffre = load_image("solve_digit/9.png");
+            break;
+
+        case 10:
+            chiffre = load_image("digit_on_grid/1.png");
+            break;
+
+        case 11:
+            chiffre = load_image("digit_on_grid/2.png");
+            break;
+
+        case 12:
+            chiffre = load_image("digit_on_grid/3.png");
+            break;
+
+        case 13:
+            chiffre = load_image("digit_on_grid/4.png");
+            break;
+
+        case 14:
+            chiffre = load_image("digit_on_grid/5.png");
+            break;
+
+        case 15:
+            chiffre = load_image("digit_on_grid/6.png");
+            break;
+
+        case 16:
+            chiffre = load_image("digit_on_grid/7.png");
+            break;
+
+        case 17:
+            chiffre = load_image("digit_on_grid/8.png");
+            break;
+
+        case 18:
+            chiffre = load_image("digit_on_grid/9.png");
+            break;
+    }
+
+
+
+    print_grid(resizenumber(chiffre), img, x, y);
+    printf("%d||%d\n", x,y);
+    //SDL_BlitSurface(num2, &position, grid , &position);
+    //SDL_SaveBMP(num2, "solve_digit/2.png");
+}
+
+
+
+
+
+
+
+
+
+
+
+

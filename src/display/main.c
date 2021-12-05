@@ -100,8 +100,8 @@ void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
 SDL_Surface* resizenumber(SDL_Surface *img)
 {
   SDL_Surface *dest = SDL_CreateRGBSurface(SDL_HWSURFACE,
-                        75,
-                        75,
+                        60,
+                        60,
                         img->format->BitsPerPixel,0,0,0,0);
   SDL_SoftStretch(img, NULL, dest, NULL);
   //SDL_BlitScaled(img, NULL, dest, NULL);
@@ -120,14 +120,29 @@ void print_grid(SDL_Surface* img, SDL_Surface* grid, int x, int y)
         }
     }
 }
-
+// Blackscale function
+Uint32 blackAndwhite(Uint32 Pixel, SDL_PixelFormat *Format)
+{
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+    SDL_GetRGB(Pixel, Format, &r, &g, &b);
+    if ((r + g + b) / 3 < 20)
+    {
+        return SDL_MapRGB(Format, 10, 200, 10);
+    }
+    else
+    {
+        return SDL_MapRGB(Format, 255, 255, 255);
+    }
+}
 
 int main()
 {
     init_sdl();
 
     SDL_Surface *grid = NULL;
-    grid = SDL_CreateRGBSurface(0, (60*10), (60*10), 32, 0,0,0,0); //load_image("grid.jpg");
+    grid = /*SDL_CreateRGBSurface(0, (60*10), (60*10), 32, 0,0,0,0);*/ load_image("grid.jpg");
     //SDL_Surface *num1 = load_image("digit_on_grid/1.png");
     SDL_Surface *num2 = load_image("digit_on_grid/2.png");
     //SDL_Surface *num3 = load_image("digit_on_grid/3.png");
@@ -152,23 +167,27 @@ int main()
     //SDL_BlitSurface(num1, &position, grid, &end);
     position.x = 22+51;
     end.x = 79+51;*/
-    int x=6;
-    int y=6;
+    int x=2;
+    int y=2;
 
 
-    for(int i=0; i<9; i++)
+    for(int i=0; i<num2->h; i++)
     {
-        x=9;
-        for(int j=0; j<9; j++)
+        //x=2;
+        for(int j=0; j<num2->w; j++)
         {
-            print_grid(num2, grid, x, y);
+            print_grid(num3, grid, x, y);
             printf("%d||%d\n", x,y);
-            x+=62;
+            x+=66;
+            if(j%3==0)
+                x+=3;
         }
-        y+=62;
+        if(i%3==0)
+            y+=3;
+        y+=66;
     }
     //SDL_BlitSurface(num2, &position, grid , &position);
-    SDL_SaveBMP(grid, "grid_solve.bmp");
+    SDL_SaveBMP(num2, "solve_digit/2.png");
 
 
     return 0;
