@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     g_signal_connect(Treat, "clicked", G_CALLBACK(on_MainButton_clicked), image);
     g_signal_connect(Crop, "clicked", G_CALLBACK(on_crop), NULL);
     g_signal_connect(Train, "clicked", G_CALLBACK(on_train), NULL);
-    g_signal_connect(MainButton, "clicked", G_CALLBACK(on_solve), NULL);
+    g_signal_connect(MainButton, "clicked", G_CALLBACK(on_solve), image);
 
     gtk_widget_show_all(window);
 
@@ -111,11 +111,15 @@ void on_train(GtkButton *button, gpointer data)
 
 void on_solve(GtkButton *button, gpointer data, char* filename)
 {
-    
+    GtkWidget *image = data;
+    GdkPixbuf *pixbuf;
+
     if(data==NULL)
     {
     }
     GTK_WIDGET(button);
+
+    printf("%s", filename);
     
     if(strcmp(filename, "image_treatment/image_ref/image_05.jpeg")==0)
     {
@@ -129,9 +133,10 @@ void on_solve(GtkButton *button, gpointer data, char* filename)
     {
         main_solver("grid_01");
     }
-
-
-    Loaded=IMG_Load("solve_grid.jpg");
+    
+    Loaded=IMG_Load("grid_solver/solve_grid.jpg");
+    pixbuf = gdk_pixbuf_new_from_file_at_size("grid_solver/solve_grid.jpg", 750,750,NULL);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
 }
 
 void on_MainButton_clicked(GtkButton *button, gpointer data)
