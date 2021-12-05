@@ -15,6 +15,7 @@ GtkWidget *ClockW;
 GtkWidget *CClockW;
 GtkWidget *FileChooser;
 GtkBuilder *Builder;
+GtkWidget *Entry;
 char* filename;
 SDL_Surface * Loaded = NULL;
 int* longueur;
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
     MainButton = GTK_WIDGET(gtk_builder_get_object(Builder, "MainButton"));
     ClockW = GTK_WIDGET(gtk_builder_get_object(Builder, "ClockW"));
     CClockW = GTK_WIDGET(gtk_builder_get_object(Builder, "CClockW"));
+    Entry = GTK_WIDGET(gtk_builder_get_object(Builder, "Entry"));
     FileChooser = GTK_WIDGET(gtk_builder_get_object(Builder, "FileChooser"));
     image = GTK_WIDGET(gtk_builder_get_object(Builder, "image"));
     GtkWidget *preview;
@@ -113,6 +115,7 @@ void on_solve(GtkButton *button, gpointer data, char* filename)
 {
     GtkWidget *image = data;
     GdkPixbuf *pixbuf;
+    const gchar *entry = gtk_entry_get_text(GTK_ENTRY(Entry));
 
     if(data==NULL)
     {
