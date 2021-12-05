@@ -62,6 +62,7 @@ int main_solver(char* filename)
     //resolve the grid if posible else return an error
     if(Solve_Sudoku(good_one, 0, 0))
     {
+        printf("toto");
         //write into a new file the solve grid
         write_file(filename,good_one);
     }

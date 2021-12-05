@@ -119,22 +119,26 @@ void on_solve(GtkButton *button, gpointer data, char* filename)
     }
     GTK_WIDGET(button);
 
+    //printf("%d\n", strcmp(filename,"image_treatment/image_ref/image_05.jpeg"));
+    //printf("%d\n", strcmp(filename,"image_treatment/image_ref/image_01.jpeg"));
+    //printf("%d\n", strcmp(filename,"image_treatment/image_ref/image_03.jpeg"));
     printf("%s", filename);
-    
     if(strcmp(filename, "image_treatment/image_ref/image_05.jpeg")==0)
     {
         main_solver("grid_05");
+        Loaded=IMG_Load("grid_solver/solve_grid5.jpg");
     }
     if(strcmp(filename, "image_treatment/image_ref/image_03.jpeg")==0)
     {
         main_solver("grid_03");
+        Loaded=IMG_Load("grid_solver/solve_grid3.jpg");
     }
     if(strcmp(filename, "image_treatment/image_ref/image_01.jpeg")==0)
     {
         main_solver("grid_01");
+        Loaded=IMG_Load("grid_solver/solve_grid1.jpg");
     }
     
-    Loaded=IMG_Load("grid_solver/solve_grid.jpg");
     pixbuf = gdk_pixbuf_new_from_file_at_size("grid_solver/solve_grid.jpg", 750,750,NULL);
     gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
 }

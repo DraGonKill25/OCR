@@ -345,7 +345,7 @@ void solve_grid(SDL_Surface* img, int imgtochoose, int x, int y)
 
 
     print_grid(resizenumber(chiffre), img, x, y);
-    printf("%d||%d\n", x,y);
+    //printf("%d||%d\n", x,y);
     //SDL_BlitSurface(num2, &position, grid , &position);
     //SDL_SaveBMP(num2, "solve_digit/2.png");
 }
